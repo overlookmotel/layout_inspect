@@ -39,15 +39,23 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
         Fields::Named(ref fields) => fields.named.iter().map(|field| {
             let name = field.ident.as_ref().expect("Missing field name");
             let name_str = name.to_string();
+            let ty = &field.ty;
+
+            // TODO Remove trailing comma after last field
             quote! {
-                stringify!(#name_str)
+                &format!(
+                    "{{\"name\":\"{}\",\"type\":\"{}\",\"offset\":{}}},",
+                    #name_str,
+                    <#ty as ::struct_inspect::Inspect>::name(),
+                    ::struct_inspect::offset_of!(#type_name, #name),
+                )
             }
         }),
         Fields::Unnamed(ref _fields) => todo!(),
         Fields::Unit => todo!(),
     };
 
-    let field_types = match data.fields {
+    let field_collect_types = match data.fields {
         Fields::Named(ref fields) => fields.named.iter().map(|field| {
             let ty = &field.ty;
             quote! {
@@ -80,12 +88,11 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                 }
 
                 fn json() -> Option<String> {
-                    // TODO Complete this
-                    Some("\"fields\":[".to_string() + #("{\"name\":" + #field_names + "}," + )* "]")
+                    Some("\"fields\":[".to_string() + #(#field_names)+* + "]")
                 }
 
                 fn collect_child_types(types: &mut ::std::collections::HashMap<String, String>) {
-                    #(#field_types)*
+                    #(#field_collect_types)*
                 }
 
                 fn type_def() -> ::struct_inspect::TypeDef {
