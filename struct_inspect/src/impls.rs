@@ -7,6 +7,10 @@ impl<T: Inspect> Inspect for Box<T> {
         "Box".to_string() + &T::name()
     }
 
+    fn kind() -> String {
+        "box".to_string()
+    }
+
     fn size() -> usize {
         mem::size_of::<Box<T>>()
     }
@@ -39,6 +43,10 @@ impl<T: Inspect> Inspect for Vec<T> {
         "Vec".to_string() + &T::name()
     }
 
+    fn kind() -> String {
+        "vec".to_string()
+    }
+
     fn size() -> usize {
         mem::size_of::<Vec<T>>()
     }
@@ -69,6 +77,10 @@ impl<T: Inspect> Inspect for Vec<T> {
 impl<T: Inspect> Inspect for Option<T> {
     fn name() -> String {
         "Option".to_string() + &T::name()
+    }
+
+    fn kind() -> String {
+        "option".to_string()
     }
 
     fn size() -> usize {

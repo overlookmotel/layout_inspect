@@ -67,6 +67,10 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                     #type_name_str.to_string()
                 }
 
+                fn kind() -> String {
+                    "struct".to_string()
+                }
+
                 fn size() -> usize {
                     ::std::mem::size_of::<#type_name>()
                 }

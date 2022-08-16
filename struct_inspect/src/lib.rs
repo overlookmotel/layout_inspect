@@ -15,6 +15,7 @@ pub fn inspect<T: Inspect>() -> HashMap<String, String> {
 pub trait Inspect {
     // To be defined in impls
     fn name() -> String;
+    fn kind() -> String;
     fn size() -> usize;
     fn align() -> usize;
     fn json() -> Option<String> {
@@ -24,8 +25,9 @@ pub trait Inspect {
 
     fn json_full() -> String {
         format!(
-            "{{\"name\":\"{}\",\"size\":{},\"align\":{}{}}}",
+            "{{\"name\":\"{}\",\"kind\":\"{}\",\"size\":{},\"align\":{}{}}}",
             &Self::name(),
+            &Self::kind(),
             &Self::size(),
             &Self::align(),
             match Self::json() {

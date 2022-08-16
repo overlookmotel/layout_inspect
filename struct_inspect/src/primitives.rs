@@ -12,6 +12,10 @@ macro_rules! primitive {
                 chars.into_iter().collect()
             }
 
+            fn kind() -> String {
+                "primitive".to_string()
+            }
+
             fn size() -> usize {
                 mem::size_of::<$type>()
             }
