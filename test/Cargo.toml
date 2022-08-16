@@ -1,0 +1,11 @@
+[package]
+name = "test"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+bench = false
+name = "test"
+
+[dependencies]
+struct_inspect = { path = "../struct_inspect" }

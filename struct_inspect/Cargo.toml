@@ -1,0 +1,9 @@
+[package]
+name = "struct_inspect"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+
+[dependencies]
+struct_inspect_derive = { path = "../struct_inspect_derive" }
