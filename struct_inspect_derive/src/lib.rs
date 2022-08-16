@@ -23,23 +23,6 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
             let name = field.ident.as_ref().expect("Missing field name");
             let name_str = name.to_string();
             let ty = &field.ty;
-            quote! {
-                ::struct_inspect::FieldDef {
-                    name: #name_str,
-                    offset: ::struct_inspect::offset_of!(#type_name, #name),
-                    type_def: <#ty as ::struct_inspect::Inspect>::type_def(),
-                }
-            }
-        }),
-        Fields::Unnamed(ref _fields) => todo!(),
-        Fields::Unit => todo!(),
-    };
-
-    let field_names = match data.fields {
-        Fields::Named(ref fields) => fields.named.iter().map(|field| {
-            let name = field.ident.as_ref().expect("Missing field name");
-            let name_str = name.to_string();
-            let ty = &field.ty;
 
             // TODO Remove trailing comma after last field
             quote! {
@@ -88,23 +71,11 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                 }
 
                 fn json() -> Option<String> {
-                    Some("\"fields\":[".to_string() + #(#field_names)+* + "]")
+                    Some("\"fields\":[".to_string() + #(#field_defs)+* + "]")
                 }
 
                 fn collect_child_types(types: &mut ::std::collections::HashMap<String, String>) {
                     #(#field_collect_types)*
-                }
-
-                fn type_def() -> ::struct_inspect::TypeDef {
-                    ::struct_inspect::TypeDef {
-                        name: #type_name_str.to_string(),
-                        kind: ::struct_inspect::TypeKind::Struct,
-                        len: ::std::mem::size_of::<#type_name>(),
-                        child: None,
-                    }
-                }
-                fn fields_def() -> Option<Vec<::struct_inspect::FieldDef>> {
-                    Some(vec![#(#field_defs, )*])
                 }
             }
         };

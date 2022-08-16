@@ -1,6 +1,6 @@
 pub use std::mem;
 
-use crate::{Inspect, TypeDef, TypeKind};
+use crate::Inspect;
 
 macro_rules! primitive {
     ($type:ty) => {
@@ -22,20 +22,6 @@ macro_rules! primitive {
 
             fn align() -> usize {
                 mem::align_of::<$type>()
-            }
-
-            fn type_def() -> TypeDef {
-                TypeDef {
-                    name: {
-                        // Uppercase type name
-                        let mut chars: Vec<char> = stringify!($type).chars().collect();
-                        chars[0] = chars[0].to_uppercase().nth(0).unwrap();
-                        chars.into_iter().collect()
-                    },
-                    kind: TypeKind::Primitive,
-                    len: mem::size_of::<$type>(),
-                    child: None,
-                }
             }
         }
     };

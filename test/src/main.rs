@@ -30,13 +30,4 @@ pub fn main() {
         println!("\t\"{name}\":{json},");
     }
     println!("}};");
-
-    // let foo = Foo::default();
-    /*
-    println!("Foo type: {:?}", Foo::type_def());
-    println!("Foo fields:");
-    for field in Foo::fields_def().unwrap() {
-        println!("{:?}", field);
-    }
-    */
 }

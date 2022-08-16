@@ -23,6 +23,7 @@ pub trait Inspect {
     }
     fn collect_child_types(_types: &mut HashMap<String, String>) -> () {}
 
+    // Should not be overidden
     fn json_full() -> String {
         format!(
             "{{\"name\":\"{}\",\"kind\":\"{}\",\"size\":{},\"align\":{}{}}}",
@@ -45,34 +46,4 @@ pub trait Inspect {
         types.insert(name, Self::json_full());
         Self::collect_child_types(types);
     }
-
-    fn type_def() -> TypeDef;
-    fn fields_def() -> Option<Vec<FieldDef>> {
-        None
-    }
-}
-
-#[derive(Debug)]
-pub struct TypeDef {
-    pub name: String,
-    pub kind: TypeKind,
-    pub len: usize,
-    pub child: Option<Box<TypeDef>>,
-}
-
-#[derive(Debug)]
-pub enum TypeKind {
-    Struct,
-    Enum,
-    Vec,
-    Box,
-    Option,
-    Primitive,
-}
-
-#[derive(Debug)]
-pub struct FieldDef {
-    pub name: &'static str,
-    pub offset: usize,
-    pub type_def: TypeDef,
 }
