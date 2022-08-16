@@ -7,7 +7,12 @@ macro_rules! primitive {
         impl Inspect for $type {
             fn type_def() -> TypeDef {
                 TypeDef {
-                    name: stringify!($type),
+                    name: {
+                        // Uppercase type name
+                        let mut chars: Vec<char> = stringify!($type).chars().collect();
+                        chars[0] = chars[0].to_uppercase().nth(0).unwrap();
+                        chars.into_iter().collect()
+                    },
                     kind: TypeKind::Primitive,
                     len: mem::size_of::<$type>(),
                     child: None,

@@ -15,7 +15,7 @@ pub trait Inspect {
 
 #[derive(Debug)]
 pub struct TypeDef {
-    pub name: &'static str,
+    pub name: String,
     pub kind: TypeKind,
     pub len: usize,
     pub child: Option<Box<TypeDef>>,

@@ -6,7 +6,7 @@ impl<T: Inspect> Inspect for Box<T> {
     fn type_def() -> TypeDef {
         let child_def = T::type_def();
         TypeDef {
-            name: "Box",
+            name: "Box".to_string() + &child_def.name,
             kind: TypeKind::Box,
             len: mem::size_of::<Self>(),
             child: Some(Box::new(child_def)),
@@ -16,22 +16,24 @@ impl<T: Inspect> Inspect for Box<T> {
 
 impl<T: Inspect> Inspect for Vec<T> {
     fn type_def() -> TypeDef {
+        let child_def = T::type_def();
         TypeDef {
-            name: "Vec",
+            name: "Vec".to_string() + &child_def.name,
             kind: TypeKind::Vec,
             len: mem::size_of::<Self>(),
-            child: Some(Box::new(T::type_def())),
+            child: Some(Box::new(child_def)),
         }
     }
 }
 
 impl<T: Inspect> Inspect for Option<T> {
     fn type_def() -> TypeDef {
+        let child_def = T::type_def();
         TypeDef {
-            name: "Option",
+            name: "Option".to_string() + &child_def.name,
             kind: TypeKind::Option,
             len: mem::size_of::<Self>(),
-            child: Some(Box::new(T::type_def())),
+            child: Some(Box::new(child_def)),
         }
     }
 }

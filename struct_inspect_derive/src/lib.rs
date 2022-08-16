@@ -42,7 +42,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
             impl Inspect for #type_name {
                 fn type_def() -> ::struct_inspect::TypeDef {
                     ::struct_inspect::TypeDef {
-                        name: #type_name_str,
+                        name: #type_name_str.to_string(),
                         kind: ::struct_inspect::TypeKind::Struct,
                         len: ::std::mem::size_of::<#type_name>(),
                         child: None,
