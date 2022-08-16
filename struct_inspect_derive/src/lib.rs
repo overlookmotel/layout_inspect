@@ -77,7 +77,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
 
                 fn json() -> Option<String> {
                     // TODO Complete this
-                    Some("\"fields\":{".to_string() + #(#field_names + ":{}," + )* "}")
+                    Some("\"fields\":[".to_string() + #("{\"name\":" + #field_names + "}," + )* "]")
                 }
 
                 fn collect_child_types(types: &mut ::std::collections::HashMap<String, String>) {
