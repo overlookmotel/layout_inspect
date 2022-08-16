@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 struct_inspect_derive = { path = "../struct_inspect_derive" }
+memoffset = { version = "0.6.5", features = ["unstable_const"] }
