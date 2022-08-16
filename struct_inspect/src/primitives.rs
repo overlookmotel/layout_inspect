@@ -12,6 +12,14 @@ macro_rules! primitive {
                 chars.into_iter().collect()
             }
 
+            fn size() -> usize {
+                mem::size_of::<$type>()
+            }
+
+            fn align() -> usize {
+                mem::align_of::<$type>()
+            }
+
             fn type_def() -> TypeDef {
                 TypeDef {
                     name: {

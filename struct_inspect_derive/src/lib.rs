@@ -35,6 +35,29 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
         Fields::Unit => todo!(),
     };
 
+    let field_names = match data.fields {
+        Fields::Named(ref fields) => fields.named.iter().map(|field| {
+            let name = field.ident.as_ref().expect("Missing field name");
+            let name_str = name.to_string();
+            quote! {
+                stringify!(#name_str)
+            }
+        }),
+        Fields::Unnamed(ref _fields) => todo!(),
+        Fields::Unit => todo!(),
+    };
+
+    let field_types = match data.fields {
+        Fields::Named(ref fields) => fields.named.iter().map(|field| {
+            let ty = &field.ty;
+            quote! {
+                <#ty as ::struct_inspect::Inspect>::collect_types(types);
+            }
+        }),
+        Fields::Unnamed(ref _fields) => todo!(),
+        Fields::Unit => todo!(),
+    };
+
     let type_name_str = type_name.to_string();
     quote! {
         #[automatically_derived]
@@ -42,6 +65,23 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
             impl Inspect for #type_name {
                 fn name() -> String {
                     #type_name_str.to_string()
+                }
+
+                fn size() -> usize {
+                    ::std::mem::size_of::<#type_name>()
+                }
+
+                fn align() -> usize {
+                    ::std::mem::align_of::<#type_name>()
+                }
+
+                fn json() -> Option<String> {
+                    // TODO Complete this
+                    Some("\"fields\":{".to_string() + #(#field_names + ":{}," + )* "}")
+                }
+
+                fn collect_child_types(types: &mut ::std::collections::HashMap<String, String>) {
+                    #(#field_types)*
                 }
 
                 fn type_def() -> ::struct_inspect::TypeDef {

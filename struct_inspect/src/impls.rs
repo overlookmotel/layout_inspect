@@ -1,10 +1,26 @@
-use std::mem;
+use std::{collections::hash_map::HashMap, mem};
 
 pub use crate::{Inspect, TypeDef, TypeKind};
 
 impl<T: Inspect> Inspect for Box<T> {
     fn name() -> String {
         "Box".to_string() + &T::name()
+    }
+
+    fn size() -> usize {
+        mem::size_of::<Box<T>>()
+    }
+
+    fn align() -> usize {
+        mem::align_of::<Box<T>>()
+    }
+
+    fn json() -> Option<String> {
+        Some(format!("\"child\":\"{}\"", &T::name()))
+    }
+
+    fn collect_child_types(types: &mut HashMap<String, String>) {
+        T::collect_types(types);
     }
 
     fn type_def() -> TypeDef {
@@ -23,6 +39,22 @@ impl<T: Inspect> Inspect for Vec<T> {
         "Vec".to_string() + &T::name()
     }
 
+    fn size() -> usize {
+        mem::size_of::<Vec<T>>()
+    }
+
+    fn align() -> usize {
+        mem::align_of::<Vec<T>>()
+    }
+
+    fn json() -> Option<String> {
+        Some(format!("\"child\":\"{}\"", &T::name()))
+    }
+
+    fn collect_child_types(types: &mut HashMap<String, String>) {
+        T::collect_types(types);
+    }
+
     fn type_def() -> TypeDef {
         let child_def = T::type_def();
         TypeDef {
@@ -37,6 +69,22 @@ impl<T: Inspect> Inspect for Vec<T> {
 impl<T: Inspect> Inspect for Option<T> {
     fn name() -> String {
         "Option".to_string() + &T::name()
+    }
+
+    fn size() -> usize {
+        mem::size_of::<Option<T>>()
+    }
+
+    fn align() -> usize {
+        mem::align_of::<Option<T>>()
+    }
+
+    fn json() -> Option<String> {
+        Some(format!("\"child\":\"{}\"", &T::name()))
+    }
+
+    fn collect_child_types(types: &mut HashMap<String, String>) {
+        T::collect_types(types);
     }
 
     fn type_def() -> TypeDef {

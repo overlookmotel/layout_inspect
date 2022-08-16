@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use struct_inspect::Inspect;
+use struct_inspect::{inspect, Inspect};
 
 #[derive(Inspect)]
 pub struct Foo {
@@ -24,10 +24,19 @@ impl Default for Foo {
 }
 
 pub fn main() {
+    let types = inspect::<Foo>();
+    println!("const types = {{");
+    for (name, json) in &types {
+        println!("\t\"{name}\":{json},");
+    }
+    println!("}};");
+
     // let foo = Foo::default();
+    /*
     println!("Foo type: {:?}", Foo::type_def());
     println!("Foo fields:");
     for field in Foo::fields_def().unwrap() {
         println!("{:?}", field);
     }
+    */
 }
