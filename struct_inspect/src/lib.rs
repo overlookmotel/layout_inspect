@@ -7,6 +7,8 @@ mod impls;
 mod primitives;
 
 pub trait Inspect {
+    fn name() -> String;
+
     fn type_def() -> TypeDef;
     fn fields_def() -> Option<Vec<FieldDef>> {
         None

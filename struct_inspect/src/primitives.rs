@@ -5,6 +5,13 @@ use crate::{Inspect, TypeDef, TypeKind};
 macro_rules! primitive {
     ($type:ty) => {
         impl Inspect for $type {
+            fn name() -> String {
+                // Uppercase type name
+                let mut chars: Vec<char> = stringify!($type).chars().collect();
+                chars[0] = chars[0].to_uppercase().nth(0).unwrap();
+                chars.into_iter().collect()
+            }
+
             fn type_def() -> TypeDef {
                 TypeDef {
                     name: {

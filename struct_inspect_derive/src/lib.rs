@@ -40,6 +40,10 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
         #[automatically_derived]
         const _: () = {
             impl Inspect for #type_name {
+                fn name() -> String {
+                    #type_name_str.to_string()
+                }
+
                 fn type_def() -> ::struct_inspect::TypeDef {
                     ::struct_inspect::TypeDef {
                         name: #type_name_str.to_string(),
