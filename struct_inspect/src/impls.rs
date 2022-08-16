@@ -20,7 +20,7 @@ impl<T: Inspect> Inspect for Box<T> {
     }
 
     fn json() -> Option<String> {
-        Some(format!("\"child\":\"{}\"", &T::name()))
+        Some(format!("\"childType\":\"{}\"", &T::name()))
     }
 
     fn collect_child_types(types: &mut HashMap<String, String>) {
@@ -56,7 +56,7 @@ impl<T: Inspect> Inspect for Vec<T> {
     }
 
     fn json() -> Option<String> {
-        Some(format!("\"child\":\"{}\"", &T::name()))
+        Some(format!("\"childType\":\"{}\"", &T::name()))
     }
 
     fn collect_child_types(types: &mut HashMap<String, String>) {
@@ -92,7 +92,7 @@ impl<T: Inspect> Inspect for Option<T> {
     }
 
     fn json() -> Option<String> {
-        Some(format!("\"child\":\"{}\"", &T::name()))
+        Some(format!("\"childType\":\"{}\"", &T::name()))
     }
 
     fn collect_child_types(types: &mut HashMap<String, String>) {
