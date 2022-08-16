@@ -1,4 +1,3 @@
-pub use std::mem;
 
 pub use memoffset::offset_of;
 pub use struct_inspect_derive::Inspect;

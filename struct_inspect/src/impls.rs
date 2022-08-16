@@ -1,4 +1,4 @@
-pub use std::mem;
+use std::mem;
 
 pub use crate::{Inspect, TypeDef, TypeKind};
 
