@@ -30,7 +30,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                     "{{\"name\":\"{}\",\"type\":\"{}\",\"offset\":{}}},",
                     #name_str,
                     <#ty as ::struct_inspect::Inspect>::name(),
-                    ::struct_inspect::offset_of!(#type_name, #name),
+                    ::struct_inspect::__offset_of!(#type_name, #name),
                 )
             }
         }),

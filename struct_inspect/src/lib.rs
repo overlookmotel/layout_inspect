@@ -1,6 +1,8 @@
 use std::collections::hash_map::HashMap;
 
-pub use memoffset::offset_of;
+// Used by `Inspect` derive macro
+#[doc(hidden)]
+pub use memoffset::offset_of as __offset_of;
 pub use struct_inspect_derive::Inspect;
 
 mod impls;
