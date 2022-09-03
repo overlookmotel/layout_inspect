@@ -8,6 +8,7 @@ pub enum DefType {
     Box(DefBox),
     Vec(DefVec),
     Option(DefOption),
+    Enum(DefEnum),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -60,4 +61,21 @@ pub struct DefOption {
     pub size: usize,
     pub align: usize,
     pub value_type_name: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct DefEnum {
+    pub name: String,
+    pub size: usize,
+    pub align: usize,
+    pub variants: Vec<DefEnumVariant>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct DefEnumVariant {
+    pub name: String,
+    pub value: u64,
+    pub value_type_name: Option<String>,
 }
