@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Fields, Ident};
+use syn::{parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Ident, Lit};
 
 #[proc_macro_derive(Inspect)]
 pub fn inspect(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -79,9 +79,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
 fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
     let mut next_value: u64 = 0;
     let variant_defs = data.variants.iter().map(|variant| {
-        let name_str = variant.ident.to_string();
-
-        let ty = match variant.fields {
+        let ty = match &variant.fields {
             Fields::Unit => quote! { None },
             Fields::Unnamed(ref fields) => {
                 let unnamed = &fields.unnamed;
@@ -94,14 +92,23 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
             _ => todo!(),
         };
 
-        // TODO Use discriminant if present
-        let value = next_value;
-        next_value += 1;
+        let value = match &variant.discriminant {
+            Some(discriminant) => match &discriminant.1 {
+                Expr::Lit(expr_lit) => match &expr_lit.lit {
+                    Lit::Int(int) => int.base10_parse::<u64>().unwrap(),
+                    _ => todo!(),
+                },
+                _ => todo!(),
+            },
+            None => next_value,
+        };
+        next_value = value + 1;
 
+        let type_name_str = variant.ident.to_string();
         quote! {
             ::struct_inspect::defs::DefEnumVariant {
-                name: #name_str.to_string(),
-                value: #value,
+                name: #type_name_str.to_string(),
+                discriminant: #value,
                 value_type_name: #ty,
             }
         }

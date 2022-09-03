@@ -76,6 +76,6 @@ pub struct DefEnum {
 #[serde(rename_all = "camelCase")]
 pub struct DefEnumVariant {
     pub name: String,
-    pub value: u64,
+    pub discriminant: u64,
     pub value_type_name: Option<String>,
 }
