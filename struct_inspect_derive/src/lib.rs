@@ -50,29 +50,27 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
     let type_name_str = type_name.to_string();
     quote! {
         #[automatically_derived]
-        const _: () = {
-            impl Inspect for #type_name {
-                fn name() -> String {
-                    #type_name_str.to_string()
-                }
-
-                fn def() -> ::struct_inspect::defs::DefType {
-                    ::struct_inspect::defs::DefType::Struct(
-                        ::struct_inspect::defs::DefStruct {
-                            name: Self::name(),
-                            size: ::std::mem::size_of::<#type_name>(),
-                            align: ::std::mem::align_of::<#type_name>(),
-                            fields: vec![#(#field_defs),*],
-                        }
-                    )
-                }
-
-                fn collect_child_types(
-                    types: &mut ::std::collections::HashMap<String, ::struct_inspect::defs::DefType>
-                ) {
-                    #(#field_collect_types)*
-                }
+        impl Inspect for #type_name {
+            fn name() -> String {
+                #type_name_str.to_string()
             }
-        };
+
+            fn def() -> ::struct_inspect::defs::DefType {
+                ::struct_inspect::defs::DefType::Struct(
+                    ::struct_inspect::defs::DefStruct {
+                        name: Self::name(),
+                        size: ::std::mem::size_of::<#type_name>(),
+                        align: ::std::mem::align_of::<#type_name>(),
+                        fields: vec![#(#field_defs),*],
+                    }
+                )
+            }
+
+            fn collect_child_types(
+                types: &mut ::std::collections::HashMap<String, ::struct_inspect::defs::DefType>
+            ) {
+                #(#field_collect_types)*
+            }
+        }
     }
 }
