@@ -24,14 +24,12 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
             let name_str = name.to_string();
             let ty = &field.ty;
 
-            // TODO Remove trailing comma after last field
             quote! {
-                &format!(
-                    "{{\"name\":\"{}\",\"type\":\"{}\",\"offset\":{}}},",
-                    #name_str,
-                    <#ty as ::struct_inspect::Inspect>::name(),
-                    ::struct_inspect::__offset_of!(#type_name, #name),
-                )
+                ::struct_inspect::defs::DefStructField {
+                    name: #name_str.to_string(),
+                    type_name: <#ty as ::struct_inspect::Inspect>::name(),
+                    offset: ::struct_inspect::__offset_of!(#type_name, #name),
+                }
             }
         }),
         Fields::Unnamed(ref _fields) => todo!(),
@@ -58,23 +56,20 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                     #type_name_str.to_string()
                 }
 
-                fn kind() -> String {
-                    "struct".to_string()
+                fn def() -> ::struct_inspect::defs::DefType {
+                    ::struct_inspect::defs::DefType::Struct(
+                        ::struct_inspect::defs::DefStruct {
+                            name: Self::name(),
+                            size: ::std::mem::size_of::<#type_name>(),
+                            align: ::std::mem::align_of::<#type_name>(),
+                            fields: vec![#(#field_defs),*]
+                        }
+                    )
                 }
 
-                fn size() -> usize {
-                    ::std::mem::size_of::<#type_name>()
-                }
-
-                fn align() -> usize {
-                    ::std::mem::align_of::<#type_name>()
-                }
-
-                fn json() -> Option<String> {
-                    Some("\"fields\":[".to_string() + #(#field_defs)+* + "]")
-                }
-
-                fn collect_child_types(types: &mut ::std::collections::HashMap<String, String>) {
+                fn collect_child_types(
+                    types: &mut ::std::collections::HashMap<String, ::struct_inspect::defs::DefType>
+                ) {
                     #(#field_collect_types)*
                 }
             }

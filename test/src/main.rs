@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-use struct_inspect::{inspect, Inspect};
+use struct_inspect::{inspect, types_to_json, Inspect};
 
 #[derive(Inspect)]
 pub struct Foo {
@@ -25,9 +25,8 @@ impl Default for Foo {
 
 pub fn main() {
     let types = inspect::<Foo>();
-    println!("const types = {{");
-    for (name, json) in &types {
-        println!("\t\"{name}\":{json},");
-    }
-    println!("}};");
+    dbg!(&types);
+
+    let json = types_to_json(&types);
+    println!("{}", &json);
 }

@@ -1,29 +1,25 @@
 use std::{collections::hash_map::HashMap, mem};
 
-pub use crate::Inspect;
+use crate::{
+    defs::{DefBox, DefOption, DefType, DefVec},
+    Inspect,
+};
 
 impl<T: Inspect> Inspect for Box<T> {
     fn name() -> String {
         "Box".to_string() + &T::name()
     }
 
-    fn kind() -> String {
-        "box".to_string()
+    fn def() -> DefType {
+        DefType::Box(DefBox {
+            name: Self::name(),
+            size: mem::size_of::<Box<T>>(),
+            align: mem::align_of::<Box<T>>(),
+            value_type_name: T::name(),
+        })
     }
 
-    fn size() -> usize {
-        mem::size_of::<Box<T>>()
-    }
-
-    fn align() -> usize {
-        mem::align_of::<Box<T>>()
-    }
-
-    fn json() -> Option<String> {
-        Some(format!("\"childType\":\"{}\"", &T::name()))
-    }
-
-    fn collect_child_types(types: &mut HashMap<String, String>) {
+    fn collect_child_types(types: &mut HashMap<String, DefType>) {
         T::collect_types(types);
     }
 }
@@ -33,23 +29,16 @@ impl<T: Inspect> Inspect for Vec<T> {
         "Vec".to_string() + &T::name()
     }
 
-    fn kind() -> String {
-        "vec".to_string()
+    fn def() -> DefType {
+        DefType::Vec(DefVec {
+            name: Self::name(),
+            size: mem::size_of::<Vec<T>>(),
+            align: mem::align_of::<Vec<T>>(),
+            value_type_name: T::name(),
+        })
     }
 
-    fn size() -> usize {
-        mem::size_of::<Vec<T>>()
-    }
-
-    fn align() -> usize {
-        mem::align_of::<Vec<T>>()
-    }
-
-    fn json() -> Option<String> {
-        Some(format!("\"childType\":\"{}\"", &T::name()))
-    }
-
-    fn collect_child_types(types: &mut HashMap<String, String>) {
+    fn collect_child_types(types: &mut HashMap<String, DefType>) {
         T::collect_types(types);
     }
 }
@@ -59,18 +48,17 @@ impl<T: Inspect> Inspect for Option<T> {
         "Option".to_string() + &T::name()
     }
 
-    fn kind() -> String {
-        "option".to_string()
+    fn def() -> DefType {
+        DefType::Option(DefOption {
+            name: Self::name(),
+            size: mem::size_of::<Option<T>>(),
+            align: mem::align_of::<Option<T>>(),
+            value_type_name: T::name(),
+        })
     }
 
-    fn size() -> usize {
-        mem::size_of::<Option<T>>()
-    }
-
-    fn align() -> usize {
-        mem::align_of::<Option<T>>()
-    }
-
+    /*
+    // Currently unused but contains logic to determine niche used for `None`
     fn json() -> Option<String> {
         // TODO Is this always correct?
         // Could maybe create a dummy `<Option<T>>` with `MaybeUninit` and then get the
@@ -131,8 +119,9 @@ impl<T: Inspect> Inspect for Option<T> {
             none_value
         ))
     }
+    */
 
-    fn collect_child_types(types: &mut HashMap<String, String>) {
+    fn collect_child_types(types: &mut HashMap<String, DefType>) {
         T::collect_types(types);
     }
 }

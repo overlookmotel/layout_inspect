@@ -1,6 +1,9 @@
 pub use std::mem;
 
-use crate::Inspect;
+use crate::{
+    defs::{DefPrimitive, DefType},
+    Inspect,
+};
 
 macro_rules! primitive {
     ($type:ty) => {
@@ -12,16 +15,12 @@ macro_rules! primitive {
                 chars.into_iter().collect()
             }
 
-            fn kind() -> String {
-                "primitive".to_string()
-            }
-
-            fn size() -> usize {
-                mem::size_of::<$type>()
-            }
-
-            fn align() -> usize {
-                mem::align_of::<$type>()
+            fn def() -> DefType {
+                DefType::Primitive(DefPrimitive {
+                    name: Self::name(),
+                    size: mem::size_of::<$type>(),
+                    align: mem::align_of::<$type>(),
+                })
             }
         }
     };
