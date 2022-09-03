@@ -25,7 +25,7 @@ pub trait Inspect {
     // To be defined in impls
     fn name() -> String;
     fn def() -> DefType;
-    fn collect_child_types(_types: &mut HashMap<String, DefType>) -> () {}
+    fn collect_child_types(_types: &mut HashMap<String, DefType>) {}
 
     // Should not be overidden
     fn collect_types(types: &mut HashMap<String, DefType>) -> () {

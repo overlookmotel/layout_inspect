@@ -62,7 +62,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                             name: Self::name(),
                             size: ::std::mem::size_of::<#type_name>(),
                             align: ::std::mem::align_of::<#type_name>(),
-                            fields: vec![#(#field_defs),*]
+                            fields: vec![#(#field_defs),*],
                         }
                     )
                 }
