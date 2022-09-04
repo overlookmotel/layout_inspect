@@ -27,6 +27,7 @@ pub struct DefStructField {
     pub js_name: String,
     pub type_name: String,
     pub offset: usize,
+    pub flatten: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

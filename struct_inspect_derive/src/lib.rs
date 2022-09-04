@@ -27,20 +27,31 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
             let name = field.ident.as_ref().expect("Missing field name");
             let name_str = name.to_string();
             let mut js_name_str = name_str.clone();
+            let mut flatten = quote! { false };
 
             for attr in &field.attrs {
                 if attr.style == AttrStyle::Outer && attr.path.is_ident("serde") {
                     let meta = attr.parse_meta().unwrap();
                     if let Meta::List(list) = meta {
                         for item in list.nested {
-                            if let NestedMeta::Meta(Meta::NameValue(name_value)) = item {
-                                if name_value.path.is_ident("rename") {
-                                    match &name_value.lit {
-                                        Lit::Str(s) => {
-                                            js_name_str = s.value();
+                            if let NestedMeta::Meta(meta) = item {
+                                match meta {
+                                    Meta::NameValue(name_value) => {
+                                        if name_value.path.is_ident("rename") {
+                                            match &name_value.lit {
+                                                Lit::Str(s) => {
+                                                    js_name_str = s.value();
+                                                }
+                                                _ => panic!("Unexpected serde rename tag"),
+                                            }
                                         }
-                                        _ => panic!("Unexpected serde rename tag"),
                                     }
+                                    Meta::Path(path) => {
+                                        if path.is_ident("flatten") {
+                                            flatten = quote! { true };
+                                        }
+                                    }
+                                    _ => {}
                                 }
                             }
                         }
@@ -55,6 +66,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                     js_name: #js_name_str.to_string(),
                     type_name: <#ty as ::struct_inspect::Inspect>::name(),
                     offset: ::struct_inspect::__offset_of!(#type_name, #name),
+                    flatten: #flatten,
                 }
             }
         }),
