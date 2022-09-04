@@ -24,6 +24,7 @@ pub struct DefStruct {
 #[serde(rename_all = "camelCase")]
 pub struct DefStructField {
     pub name: String,
+    pub js_name: String,
     pub type_name: String,
     pub offset: usize,
 }

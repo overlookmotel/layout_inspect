@@ -1,6 +1,9 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Ident, Lit};
+use syn::{
+    parse_macro_input, AttrStyle, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Ident,
+    Lit, Meta, NestedMeta,
+};
 
 #[proc_macro_derive(Inspect)]
 pub fn inspect(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -23,11 +26,33 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
         Fields::Named(ref fields) => fields.named.iter().map(|field| {
             let name = field.ident.as_ref().expect("Missing field name");
             let name_str = name.to_string();
-            let ty = &field.ty;
+            let mut js_name_str = name_str.clone();
 
+            for attr in &field.attrs {
+                if attr.style == AttrStyle::Outer && attr.path.is_ident("serde") {
+                    let meta = attr.parse_meta().unwrap();
+                    if let Meta::List(list) = meta {
+                        for item in list.nested {
+                            if let NestedMeta::Meta(Meta::NameValue(name_value)) = item {
+                                if name_value.path.is_ident("rename") {
+                                    match &name_value.lit {
+                                        Lit::Str(s) => {
+                                            js_name_str = s.value();
+                                        }
+                                        _ => panic!("Unexpected serde rename tag"),
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            let ty = &field.ty;
             quote! {
                 ::struct_inspect::defs::DefStructField {
                     name: #name_str.to_string(),
+                    js_name: #js_name_str.to_string(),
                     type_name: <#ty as ::struct_inspect::Inspect>::name(),
                     offset: ::struct_inspect::__offset_of!(#type_name, #name),
                 }
