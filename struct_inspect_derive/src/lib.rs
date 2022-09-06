@@ -22,7 +22,7 @@ fn inspect_impl(input: DeriveInput) -> TokenStream {
 }
 
 fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
-    let field_defs = match data.fields {
+    let (field_defs, field_collect_types): (Vec<_>, Vec<_>) = match data.fields {
         Fields::Named(ref fields) => fields.named.iter().map(|field| {
             let name = field.ident.as_ref().expect("Missing field name");
             let name_str = name.to_string();
@@ -60,7 +60,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
             }
 
             let ty = &field.ty;
-            quote! {
+            let field_def = quote! {
                 ::struct_inspect::defs::DefStructField {
                     name: #name_str.to_string(),
                     js_name: #js_name_str.to_string(),
@@ -68,22 +68,16 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
                     offset: ::struct_inspect::__offset_of!(#type_name, #name),
                     flatten: #flatten,
                 }
-            }
-        }),
-        Fields::Unnamed(ref _fields) => todo!(),
-        Fields::Unit => todo!(),
-    };
-
-    let field_collect_types = match data.fields {
-        Fields::Named(ref fields) => fields.named.iter().map(|field| {
-            let ty = &field.ty;
-            quote! {
+            };
+            let collect_type = quote! {
                 <#ty as ::struct_inspect::Inspect>::collect_types(types);
-            }
+            };
+            (field_def, collect_type)
         }),
         Fields::Unnamed(ref _fields) => todo!(),
         Fields::Unit => todo!(),
-    };
+    }
+    .unzip();
 
     let type_name_str = type_name.to_string();
     quote! {
@@ -115,54 +109,56 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
 
 fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
     let mut next_discriminant: u64 = 0;
-    let variant_defs = data.variants.iter().map(|variant| {
-        let ty = match &variant.fields {
-            Fields::Unit => quote! { None },
-            Fields::Unnamed(ref fields) => {
-                let unnamed = &fields.unnamed;
-                assert!(unnamed.len() == 1);
-                let ty = &unnamed.first().unwrap().ty;
-                quote! {
-                    Some(<#ty as ::struct_inspect::Inspect>::name())
-                }
-            }
-            Fields::Named(_) => todo!(),
-        };
 
-        let discriminant = match &variant.discriminant {
-            Some(discriminant) => match &discriminant.1 {
-                Expr::Lit(expr_lit) => match &expr_lit.lit {
-                    Lit::Int(int) => int.base10_parse::<u64>().unwrap(),
+    let (variant_defs, variant_collect_types): (Vec<_>, Vec<_>) = data
+        .variants
+        .iter()
+        .map(|variant| {
+            let (value_type_name, collect_type) = match &variant.fields {
+                Fields::Unit => {
+                    let ty = quote! { None };
+                    let collect_type = quote! {};
+                    (ty, collect_type)
+                }
+                Fields::Unnamed(ref fields) => {
+                    let unnamed = &fields.unnamed;
+                    assert!(unnamed.len() == 1);
+                    let ty = &unnamed.first().unwrap().ty;
+                    let value_type_name = quote! {
+                        Some(<#ty as ::struct_inspect::Inspect>::name())
+                    };
+                    let collect_type = quote! {
+                        <#ty as ::struct_inspect::Inspect>::collect_types(types);
+                    };
+                    (value_type_name, collect_type)
+                }
+                Fields::Named(_) => todo!(),
+            };
+
+            let discriminant = match &variant.discriminant {
+                Some(discriminant) => match &discriminant.1 {
+                    Expr::Lit(expr_lit) => match &expr_lit.lit {
+                        Lit::Int(int) => int.base10_parse::<u64>().unwrap(),
+                        _ => todo!(),
+                    },
                     _ => todo!(),
                 },
-                _ => todo!(),
-            },
-            None => next_discriminant,
-        };
-        next_discriminant = discriminant + 1;
+                None => next_discriminant,
+            };
+            next_discriminant = discriminant + 1;
 
-        let type_name_str = variant.ident.to_string();
-        quote! {
-            ::struct_inspect::defs::DefEnumVariant {
-                name: #type_name_str.to_string(),
-                discriminant: #discriminant,
-                value_type_name: #ty,
-            }
-        }
-    });
+            let type_name_str = variant.ident.to_string();
+            let variant_def = quote! {
+                ::struct_inspect::defs::DefEnumVariant {
+                    name: #type_name_str.to_string(),
+                    discriminant: #discriminant,
+                    value_type_name: #value_type_name,
+                }
+            };
 
-    let variant_collect_types = data.variants.iter().map(|variant| match variant.fields {
-        Fields::Unit => quote! {},
-        Fields::Unnamed(ref fields) => {
-            let unnamed = &fields.unnamed;
-            assert!(unnamed.len() == 1);
-            let ty = &unnamed.first().unwrap().ty;
-            quote! {
-                <#ty as ::struct_inspect::Inspect>::collect_types(types);
-            }
-        }
-        Fields::Named(_) => todo!(),
-    });
+            (variant_def, collect_type)
+        })
+        .unzip();
 
     let type_name_str = type_name.to_string();
     quote! {
