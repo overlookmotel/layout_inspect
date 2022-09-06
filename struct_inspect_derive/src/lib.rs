@@ -126,7 +126,7 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
                     Some(<#ty as ::struct_inspect::Inspect>::name())
                 }
             }
-            _ => todo!(),
+            Fields::Named(_) => todo!(),
         };
 
         let discriminant = match &variant.discriminant {
@@ -161,7 +161,7 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
                 <#ty as ::struct_inspect::Inspect>::collect_types(types);
             }
         }
-        _ => todo!(),
+        Fields::Named(_) => todo!(),
     });
 
     let type_name_str = type_name.to_string();
