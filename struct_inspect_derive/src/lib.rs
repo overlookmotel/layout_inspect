@@ -114,7 +114,7 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
 }
 
 fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
-    let mut next_value: u64 = 0;
+    let mut next_discriminant: u64 = 0;
     let variant_defs = data.variants.iter().map(|variant| {
         let ty = match &variant.fields {
             Fields::Unit => quote! { None },
@@ -129,7 +129,7 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
             _ => todo!(),
         };
 
-        let value = match &variant.discriminant {
+        let discriminant = match &variant.discriminant {
             Some(discriminant) => match &discriminant.1 {
                 Expr::Lit(expr_lit) => match &expr_lit.lit {
                     Lit::Int(int) => int.base10_parse::<u64>().unwrap(),
@@ -137,15 +137,15 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
                 },
                 _ => todo!(),
             },
-            None => next_value,
+            None => next_discriminant,
         };
-        next_value = value + 1;
+        next_discriminant = discriminant + 1;
 
         let type_name_str = variant.ident.to_string();
         quote! {
             ::struct_inspect::defs::DefEnumVariant {
                 name: #type_name_str.to_string(),
-                discriminant: #value,
+                discriminant: #discriminant,
                 value_type_name: #ty,
             }
         }
