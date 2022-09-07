@@ -79,5 +79,6 @@ pub struct DefEnum {
 pub struct DefEnumVariant {
     pub name: String,
     pub discriminant: u64,
+    pub value: Option<String>,
     pub value_type_name: Option<String>,
 }

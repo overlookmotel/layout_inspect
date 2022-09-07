@@ -1,5 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::quote;
+use regex::Regex;
 use syn::{
     parse_macro_input, AttrStyle, Data, DataEnum, DataStruct, DeriveInput, Expr, Fields, Ident,
     Lit, Meta, NestedMeta,
@@ -114,23 +115,59 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
         .variants
         .iter()
         .map(|variant| {
-            let (value_type_name, collect_type) = match &variant.fields {
+            let (value, value_type_name, collect_type) = match &variant.fields {
                 Fields::Unit => {
-                    let ty = quote! { None };
+                    let doc_comments: Vec<_> = variant
+                        .attrs
+                        .iter()
+                        .filter(|attr| attr.style == AttrStyle::Outer && attr.path.is_ident("doc"))
+                        .collect();
+                    assert!(
+                        doc_comments.len() == 1,
+                        "{} enum {} option has {} value doc comment",
+                        type_name,
+                        variant.ident,
+                        match doc_comments.len() {
+                            0 => "no",
+                            _ => "more than one",
+                        },
+                    );
+
+                    let meta = doc_comments[0].parse_meta().unwrap();
+                    let value = match meta {
+                        Meta::NameValue(name_value) => match &name_value.lit {
+                            Lit::Str(s) => s.value(),
+                            _ => panic!(
+                                "Unexpected value doc comment for {} enum {} option",
+                                type_name, variant.ident
+                            ),
+                        },
+                        _ => panic!(
+                            "Unexpected value doc comment for {} enum {} option",
+                            type_name, variant.ident
+                        ),
+                    };
+
+                    let regex = Regex::new("^ `(.+)`$").unwrap();
+                    let value = &regex.captures(&value).unwrap()[1];
+
+                    let value = quote! { Some(#value.to_string()) };
+                    let value_type_name = quote! { None };
                     let collect_type = quote! {};
-                    (ty, collect_type)
+                    (value, value_type_name, collect_type)
                 }
                 Fields::Unnamed(ref fields) => {
                     let unnamed = &fields.unnamed;
                     assert!(unnamed.len() == 1);
                     let ty = &unnamed.first().unwrap().ty;
+                    let value = quote! { None };
                     let value_type_name = quote! {
                         Some(<#ty as ::struct_inspect::Inspect>::name())
                     };
                     let collect_type = quote! {
                         <#ty as ::struct_inspect::Inspect>::collect_types(types);
                     };
-                    (value_type_name, collect_type)
+                    (value, value_type_name, collect_type)
                 }
                 Fields::Named(_) => todo!(),
             };
@@ -152,6 +189,7 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
                 ::struct_inspect::defs::DefEnumVariant {
                     name: #type_name_str.to_string(),
                     discriminant: #discriminant,
+                    value: #value,
                     value_type_name: #value_type_name,
                 }
             };
