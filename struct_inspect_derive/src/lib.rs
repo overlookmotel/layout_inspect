@@ -83,8 +83,8 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
     let type_name_str = type_name.to_string();
     quote! {
         #[automatically_derived]
-        impl Inspect for #type_name {
-            fn name() -> String {
+        impl ::struct_inspect::Inspect for #type_name {
+            fn name() -> ::std::string::String {
                 #type_name_str.to_string()
             }
 
@@ -100,7 +100,10 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
             }
 
             fn collect_child_types(
-                types: &mut ::std::collections::HashMap<String, ::struct_inspect::defs::DefType>
+                types: &mut ::std::collections::HashMap<
+                    ::std::string::String,
+                    ::struct_inspect::defs::DefType
+                >
             ) {
                 #(#field_collect_types)*
             }
@@ -151,8 +154,8 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
                     let regex = Regex::new("^ `(.+)`$").unwrap();
                     let value = &regex.captures(&value).unwrap()[1];
 
-                    let value = quote! { Some(#value.to_string()) };
-                    let value_type_name = quote! { None };
+                    let value = quote! { ::std::option::Option::Some(#value.to_string()) };
+                    let value_type_name = quote! { ::std::option::Option::None };
                     let collect_type = quote! {};
                     (value, value_type_name, collect_type)
                 }
@@ -160,9 +163,9 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
                     let unnamed = &fields.unnamed;
                     assert!(unnamed.len() == 1);
                     let ty = &unnamed.first().unwrap().ty;
-                    let value = quote! { None };
+                    let value = quote! { ::std::option::Option::None };
                     let value_type_name = quote! {
-                        Some(<#ty as ::struct_inspect::Inspect>::name())
+                        ::std::option::Option::Some(<#ty as ::struct_inspect::Inspect>::name())
                     };
                     let collect_type = quote! {
                         <#ty as ::struct_inspect::Inspect>::collect_types(types);
@@ -202,7 +205,7 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
     quote! {
         #[automatically_derived]
         impl Inspect for #type_name {
-            fn name() -> String {
+            fn name() -> ::std::string::String {
                 #type_name_str.to_string()
             }
 
@@ -212,13 +215,16 @@ fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
                         name: Self::name(),
                         size: ::std::mem::size_of::<#type_name>(),
                         align: ::std::mem::align_of::<#type_name>(),
-                        variants: vec![#(#variant_defs),*],
+                        variants: ::std::vec![#(#variant_defs),*],
                     }
                 )
             }
 
             fn collect_child_types(
-                types: &mut ::std::collections::HashMap<String, ::struct_inspect::defs::DefType>
+                types: &mut ::std::collections::HashMap<
+                    ::std::string::String,
+                    ::struct_inspect::defs::DefType
+                >
             ) {
                 #(#variant_collect_types)*
             }
