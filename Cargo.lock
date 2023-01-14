@@ -146,6 +146,14 @@ name = "test"
 version = "0.1.0"
 dependencies = [
  "struct_inspect",
+ "types",
+]
+
+[[package]]
+name = "types"
+version = "0.1.0"
+dependencies = [
+ "struct_inspect",
 ]
 
 [[package]]

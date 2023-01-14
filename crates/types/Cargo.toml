@@ -1,12 +1,9 @@
 [package]
-name = "test"
+name = "types"
 version = "0.1.0"
 edition = "2021"
 
-[[bin]]
-bench = false
-name = "test"
+[lib]
 
 [dependencies]
 struct_inspect = { path = "../struct_inspect" }
-types = { path = "../types" }
