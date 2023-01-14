@@ -7,7 +7,7 @@ use crate::{
 
 impl<T: Inspect> Inspect for Box<T> {
     fn name() -> String {
-        "Box".to_string() + &T::name()
+        "Box<".to_string() + &T::name() + ">"
     }
 
     fn def() -> DefType {
@@ -26,7 +26,7 @@ impl<T: Inspect> Inspect for Box<T> {
 
 impl<T: Inspect> Inspect for Vec<T> {
     fn name() -> String {
-        "Vec".to_string() + &T::name()
+        "Vec<".to_string() + &T::name() + ">"
     }
 
     fn def() -> DefType {
@@ -45,7 +45,7 @@ impl<T: Inspect> Inspect for Vec<T> {
 
 impl<T: Inspect> Inspect for Option<T> {
     fn name() -> String {
-        "Option".to_string() + &T::name()
+        "Option<".to_string() + &T::name() + ">"
     }
 
     fn def() -> DefType {
