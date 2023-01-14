@@ -8,5 +8,4 @@ bench = false
 name = "entry"
 
 [dependencies]
-struct_inspect = { path = "../struct_inspect" }
 types = { path = "../types" }

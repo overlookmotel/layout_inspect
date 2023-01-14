@@ -4,5 +4,6 @@ members = [
   "crates/struct_inspect_derive",
   "crates/types",
   "crates/entry",
+  "crates/builder",
 ]
-default-members = ["crates/entry"]
+default-members = ["crates/entry", "crates/builder"]
