@@ -1,4 +1,10 @@
-pub use std::mem;
+use std::{
+    mem,
+    num::{
+        NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
+        NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize,
+    },
+};
 
 use crate::{
     defs::{DefPrimitive, DefType},
@@ -7,12 +13,18 @@ use crate::{
 
 macro_rules! primitive {
     ($type:ty) => {
+        primitive_impl! {$type, uppercase(stringify!($type))}
+    };
+    ($type:ty, $name:ty) => {
+        primitive_impl! {$type, stringify!($name)}
+    };
+}
+
+macro_rules! primitive_impl {
+    ($type:ty, $name:expr) => {
         impl Inspect for $type {
             fn name() -> String {
-                // Uppercase type name
-                let mut chars: Vec<char> = stringify!($type).chars().collect();
-                chars[0] = chars[0].to_uppercase().nth(0).unwrap();
-                chars.into_iter().collect()
+                $name.to_string()
             }
 
             fn def() -> DefType {
@@ -26,18 +38,44 @@ macro_rules! primitive {
     };
 }
 
-primitive!(bool);
+fn uppercase(str: &str) -> String {
+    let mut chars: Vec<char> = str.chars().collect();
+    chars[0] = chars[0].to_uppercase().nth(0).unwrap();
+    chars.into_iter().collect()
+}
+
 primitive!(u8);
 primitive!(u16);
 primitive!(u32);
 primitive!(u64);
 primitive!(u128);
+primitive!(usize);
+
 primitive!(i8);
 primitive!(i16);
 primitive!(i32);
 primitive!(i64);
 primitive!(i128);
+primitive!(isize);
+
+primitive!(NonZeroU8);
+primitive!(NonZeroU16);
+primitive!(NonZeroU32);
+primitive!(NonZeroU64);
+primitive!(NonZeroU128);
+primitive!(NonZeroUsize);
+
+primitive!(NonZeroI8);
+primitive!(NonZeroI16);
+primitive!(NonZeroI32);
+primitive!(NonZeroI64);
+primitive!(NonZeroI128);
+primitive!(NonZeroIsize);
+
 primitive!(f32);
 primitive!(f64);
-primitive!(usize);
-primitive!(isize);
+
+primitive!(bool);
+primitive!(char);
+
+primitive!((), Unit);
