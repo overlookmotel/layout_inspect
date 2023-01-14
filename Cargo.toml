@@ -1,7 +1,7 @@
 [workspace]
 members = [
-  "struct_inspect",
-  "struct_inspect_derive",
-  "test",
+  "crates/struct_inspect",
+  "crates/struct_inspect_derive",
+  "crates/test",
 ]
-default-members = ["test"]
+default-members = ["crates/test"]
