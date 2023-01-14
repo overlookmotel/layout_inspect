@@ -18,7 +18,7 @@ pub fn inspect<T: Inspect>() -> HashMap<String, DefType> {
 }
 
 pub fn types_to_json(types: &HashMap<String, DefType>) -> String {
-    serde_json::to_string_pretty(types).unwrap()
+    serde_json::to_string(types).unwrap()
 }
 
 pub trait Inspect {
