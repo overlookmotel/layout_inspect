@@ -6,6 +6,8 @@ use syn::{
     Lit, Meta, NestedMeta,
 };
 
+// TODO Support generic structs e.g. `struct Foo<T> { inner: T }`
+
 #[proc_macro_derive(Inspect)]
 pub fn inspect(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
