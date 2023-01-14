@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(tag = "kind")]
 pub enum DefType {
     Struct(DefStruct),
@@ -11,7 +11,7 @@ pub enum DefType {
     Enum(DefEnum),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefStruct {
     pub name: String,
@@ -20,7 +20,7 @@ pub struct DefStruct {
     pub fields: Vec<DefStructField>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefStructField {
     pub name: String,
@@ -30,7 +30,7 @@ pub struct DefStructField {
     pub flatten: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefPrimitive {
     pub name: String,
@@ -38,7 +38,7 @@ pub struct DefPrimitive {
     pub align: usize,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefBox {
     pub name: String,
@@ -47,7 +47,7 @@ pub struct DefBox {
     pub value_type_name: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefVec {
     pub name: String,
@@ -56,7 +56,7 @@ pub struct DefVec {
     pub value_type_name: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefOption {
     pub name: String,
@@ -65,7 +65,7 @@ pub struct DefOption {
     pub value_type_name: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefEnum {
     pub name: String,
@@ -74,7 +74,7 @@ pub struct DefEnum {
     pub variants: Vec<DefEnumVariant>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefEnumVariant {
     pub name: String,
