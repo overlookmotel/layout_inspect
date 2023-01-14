@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 struct_inspect = { path = "../struct_inspect" }
+serde = { version = "1.0", features = ["derive"] }
