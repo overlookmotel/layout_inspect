@@ -2,14 +2,13 @@ use std::mem::{align_of, size_of};
 
 use struct_inspect::{
 	defs::{DefPrimitive, DefType},
-	Inspect,
+	inspect,
 };
 
 #[test]
 fn u8() {
-	assert_eq!(u8::name(), "U8");
 	assert_eq!(
-		u8::def(),
+		inspect::<u8>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "U8".to_string(),
 			size: size_of::<u8>(),
@@ -20,9 +19,8 @@ fn u8() {
 
 #[test]
 fn u32() {
-	assert_eq!(u32::name(), "U32");
 	assert_eq!(
-		u32::def(),
+		inspect::<u32>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "U32".to_string(),
 			size: size_of::<u32>(),
@@ -33,9 +31,8 @@ fn u32() {
 
 #[test]
 fn u128() {
-	assert_eq!(u128::name(), "U128");
 	assert_eq!(
-		u128::def(),
+		inspect::<u128>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "U128".to_string(),
 			size: size_of::<u128>(),
@@ -46,9 +43,8 @@ fn u128() {
 
 #[test]
 fn i8() {
-	assert_eq!(i8::name(), "I8");
 	assert_eq!(
-		i8::def(),
+		inspect::<i8>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "I8".to_string(),
 			size: size_of::<i8>(),
@@ -59,9 +55,8 @@ fn i8() {
 
 #[test]
 fn f64() {
-	assert_eq!(f64::name(), "F64");
 	assert_eq!(
-		f64::def(),
+		inspect::<f64>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "F64".to_string(),
 			size: size_of::<f64>(),
@@ -72,9 +67,8 @@ fn f64() {
 
 #[test]
 fn usize() {
-	assert_eq!(usize::name(), "Usize");
 	assert_eq!(
-		usize::def(),
+		inspect::<usize>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "Usize".to_string(),
 			size: size_of::<usize>(),
@@ -85,9 +79,8 @@ fn usize() {
 
 #[test]
 fn isize() {
-	assert_eq!(isize::name(), "Isize");
 	assert_eq!(
-		isize::def(),
+		inspect::<isize>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "Isize".to_string(),
 			size: size_of::<isize>(),
@@ -99,9 +92,8 @@ fn isize() {
 #[test]
 fn non_zero_u8() {
 	use std::num::NonZeroU8;
-	assert_eq!(NonZeroU8::name(), "NonZeroU8");
 	assert_eq!(
-		NonZeroU8::def(),
+		inspect::<NonZeroU8>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "NonZeroU8".to_string(),
 			size: size_of::<NonZeroU8>(),
@@ -112,9 +104,8 @@ fn non_zero_u8() {
 
 #[test]
 fn bool() {
-	assert_eq!(bool::name(), "Bool");
 	assert_eq!(
-		bool::def(),
+		inspect::<bool>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "Bool".to_string(),
 			size: size_of::<bool>(),
@@ -125,9 +116,8 @@ fn bool() {
 
 #[test]
 fn unit() {
-	assert_eq!(<() as Inspect>::name(), "Unit");
 	assert_eq!(
-		<() as Inspect>::def(),
+		inspect::<()>()[0],
 		DefType::Primitive(DefPrimitive {
 			name: "Unit".to_string(),
 			size: 0,

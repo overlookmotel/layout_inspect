@@ -115,6 +115,7 @@ name = "struct_inspect"
 version = "0.1.0"
 dependencies = [
  "memoffset",
+ "regex",
  "serde",
  "serde_json",
  "struct_inspect_derive",

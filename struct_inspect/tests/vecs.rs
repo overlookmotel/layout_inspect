@@ -2,21 +2,24 @@ use std::mem::{align_of, size_of};
 
 use struct_inspect::{
 	defs::{DefType, DefVec},
-	Inspect,
+	inspect, Inspect,
 };
 
 #[test]
 fn vec_primitive() {
-	assert_eq!(Vec::<u8>::name(), "Vec<U8>");
+	let type_defs = inspect::<Vec<u8>>();
+
 	assert_eq!(
-		Vec::<u8>::def(),
-		DefType::Vec(DefVec {
+		&type_defs[0],
+		&DefType::Vec(DefVec {
 			name: "Vec<U8>".to_string(),
 			size: size_of::<usize>() * 3,
 			align: align_of::<usize>(),
-			value_type_name: "U8".to_string(),
+			value_type_id: 1,
 		})
 	);
+
+	assert_eq!(type_defs[1].name(), "U8");
 }
 
 #[test]
@@ -27,14 +30,17 @@ fn vec_struct() {
 		big: u128,
 	}
 
-	assert_eq!(Vec::<Foo>::name(), "Vec<Foo>");
+	let type_defs = inspect::<Vec<Foo>>();
+
 	assert_eq!(
-		Vec::<Foo>::def(),
-		DefType::Vec(DefVec {
+		&type_defs[0],
+		&DefType::Vec(DefVec {
 			name: "Vec<Foo>".to_string(),
 			size: size_of::<usize>() * 3,
 			align: align_of::<usize>(),
-			value_type_name: "Foo".to_string(),
+			value_type_id: 1,
 		})
 	);
+
+	assert_eq!(type_defs[1].name(), "Foo");
 }

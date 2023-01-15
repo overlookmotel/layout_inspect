@@ -1,3 +1,5 @@
+#![cfg_attr(feature = "nightly", feature(core_intrinsics))]
+
 use std::{collections::hash_map::HashMap, fs, io, path::Path};
 
 // Used by `Inspect` derive macro
@@ -11,14 +13,16 @@ mod impls;
 mod primitives;
 use defs::DefType;
 
-pub fn inspect<T: Inspect>() -> HashMap<String, DefType> {
-	let mut types = HashMap::<String, DefType>::new();
-	T::collect_types(&mut types);
-	types
+pub type TypeId = u32;
+
+pub fn inspect<T: Inspect>() -> Vec<DefType> {
+	let mut collector = TypesCollector::new();
+	collector.collect::<T>();
+	collector.into_types()
 }
 
 pub fn write_types_to_json_file<P: AsRef<Path>>(
-	types: &HashMap<String, DefType>,
+	types: &Vec<DefType>,
 	path: P,
 	pretty: bool,
 ) -> io::Result<()> {
@@ -26,7 +30,7 @@ pub fn write_types_to_json_file<P: AsRef<Path>>(
 	fs::write(path, json)
 }
 
-pub fn types_to_json(types: &HashMap<String, DefType>, pretty: bool) -> String {
+pub fn types_to_json(types: &Vec<DefType>, pretty: bool) -> String {
 	if pretty {
 		serde_json::to_string_pretty(types).unwrap()
 	} else {
@@ -34,19 +38,64 @@ pub fn types_to_json(types: &HashMap<String, DefType>, pretty: bool) -> String {
 	}
 }
 
-pub trait Inspect {
-	// To be defined in impls
+pub trait Inspect: 'static {
 	fn name() -> String;
-	fn def() -> DefType;
-	fn collect_child_types(_types: &mut HashMap<String, DefType>) {}
+	fn def(_collector: &mut TypesCollector) -> DefType;
+}
 
-	// Should not be overidden
-	fn collect_types(types: &mut HashMap<String, DefType>) -> () {
-		let name = Self::name();
-		if types.contains_key(&name) {
-			return;
-		};
-		types.insert(name, Self::def());
-		Self::collect_child_types(types);
+pub struct TypesCollector {
+	types: Vec<Option<DefType>>,
+	native_type_id_to_id: HashMap<u64, TypeId>,
+}
+
+impl TypesCollector {
+	fn new() -> Self {
+		TypesCollector {
+			types: Vec::new(),
+			native_type_id_to_id: HashMap::new(),
+		}
 	}
+
+	pub fn collect<T: Inspect>(&mut self) -> TypeId {
+		let native_id = type_id_of::<T>();
+
+		if let Some(id) = self.native_type_id_to_id.get(&native_id) {
+			*id
+		} else {
+			let id = self.types.len() as TypeId;
+			self.native_type_id_to_id.insert(native_id, id);
+
+			self.types.push(None);
+
+			let def = T::def(self);
+			self.types[id as usize] = Some(def);
+			id
+		}
+	}
+
+	fn into_types(self) -> Vec<DefType> {
+		self
+			.types
+			.into_iter()
+			.map(|type_def| type_def.unwrap())
+			.collect()
+	}
+}
+
+#[cfg(feature = "nightly")]
+fn type_id_of<T: 'static>() -> u64 {
+	use std::intrinsics::type_id;
+	type_id::<T>()
+}
+
+#[cfg(not(feature = "nightly"))]
+fn type_id_of<T: 'static + ?Sized>() -> u64 {
+	// Hacky way to get Rust's native type ID without nightly.
+	// `std::any::TypeId` does not expose any direct way to get the actual u64 ID.
+	use std::any;
+
+	use regex::Regex;
+	let id = format!("{:?}", any::TypeId::of::<T>());
+	let regex = Regex::new(r"^TypeId\s*\{\s*t:\s*(\d+)\s*\}$").unwrap();
+	regex.captures(&id).unwrap()[1].parse::<u64>().unwrap()
 }

@@ -2,21 +2,24 @@ use std::mem::{align_of, size_of};
 
 use struct_inspect::{
 	defs::{DefBox, DefType},
-	Inspect,
+	inspect, Inspect,
 };
 
 #[test]
 fn boxed_primitive() {
-	assert_eq!(Box::<u8>::name(), "Box<U8>");
+	let type_defs = inspect::<Box<u8>>();
+
 	assert_eq!(
-		Box::<u8>::def(),
-		DefType::Box(DefBox {
+		&type_defs[0],
+		&DefType::Box(DefBox {
 			name: "Box<U8>".to_string(),
 			size: size_of::<usize>(),
 			align: align_of::<usize>(),
-			value_type_name: "U8".to_string(),
+			value_type_id: 1,
 		})
 	);
+
+	assert_eq!(type_defs[1].name(), "U8");
 }
 
 #[test]
@@ -27,14 +30,17 @@ fn boxed_struct() {
 		big: u128,
 	}
 
-	assert_eq!(Box::<Foo>::name(), "Box<Foo>");
+	let type_defs = inspect::<Box<Foo>>();
+
 	assert_eq!(
-		Box::<Foo>::def(),
-		DefType::Box(DefBox {
+		&type_defs[0],
+		&DefType::Box(DefBox {
 			name: "Box<Foo>".to_string(),
 			size: size_of::<usize>(),
 			align: align_of::<usize>(),
-			value_type_name: "Foo".to_string(),
+			value_type_id: 1,
 		})
 	);
+
+	assert_eq!(type_defs[1].name(), "Foo");
 }

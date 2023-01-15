@@ -2,7 +2,7 @@ use std::mem::{align_of, size_of};
 
 use struct_inspect::{
 	defs::{DefStruct, DefStructField, DefType},
-	Inspect,
+	inspect, Inspect,
 };
 
 // TODO Test for tuple struct - not implemented yet
@@ -14,22 +14,26 @@ fn struct_single_field() {
 		num: u8,
 	}
 
-	assert_eq!(Foo::name(), "Foo");
+	let type_defs = inspect::<Foo>();
+
 	assert_eq!(
-		Foo::def(),
-		DefType::Struct(DefStruct {
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
 			size: size_of::<Foo>(),
 			align: align_of::<Foo>(),
 			fields: vec![DefStructField {
 				name: "num".to_string(),
 				js_name: "num".to_string(),
-				type_name: "U8".to_string(),
+				type_id: 1,
 				offset: 0,
 				flatten: false,
 			}]
 		})
 	);
+
+	let field_ids = get_field_ids(&type_defs[0]);
+	assert_eq!(type_defs[field_ids[0]].name(), "U8");
 }
 
 #[test]
@@ -37,9 +41,8 @@ fn struct_empty() {
 	#[derive(Inspect)]
 	struct Foo {}
 
-	assert_eq!(Foo::name(), "Foo");
 	assert_eq!(
-		Foo::def(),
+		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
 			size: 0,
@@ -59,10 +62,11 @@ fn struct_multiple_fields() {
 		recurse: Option<Box<Foo>>,
 	}
 
-	assert_eq!(Foo::name(), "Foo");
+	let type_defs = inspect::<Foo>();
+
 	assert_eq!(
-		Foo::def(),
-		DefType::Struct(DefStruct {
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
 			size: size_of::<Foo>(),
 			align: align_of::<Foo>(),
@@ -70,34 +74,40 @@ fn struct_multiple_fields() {
 				DefStructField {
 					name: "small".to_string(),
 					js_name: "small".to_string(),
-					type_name: "U8".to_string(),
+					type_id: 1,
 					offset: size_of::<usize>() * 4 + size_of::<u16>(),
 					flatten: false
 				},
 				DefStructField {
 					name: "medium".to_string(),
 					js_name: "medium".to_string(),
-					type_name: "U16".to_string(),
+					type_id: 2,
 					offset: size_of::<usize>() * 4,
 					flatten: false
 				},
 				DefStructField {
 					name: "veccy".to_string(),
 					js_name: "veccy".to_string(),
-					type_name: "Vec<U8>".to_string(),
+					type_id: 3,
 					offset: 0,
 					flatten: false
 				},
 				DefStructField {
 					name: "recurse".to_string(),
 					js_name: "recurse".to_string(),
-					type_name: "Option<Box<Foo>>".to_string(),
+					type_id: 4,
 					offset: size_of::<usize>() * 3,
 					flatten: false
 				}
 			]
 		})
 	);
+
+	let field_ids = get_field_ids(&type_defs[0]);
+	assert_eq!(type_defs[field_ids[0]].name(), "U8");
+	assert_eq!(type_defs[field_ids[1]].name(), "U16");
+	assert_eq!(type_defs[field_ids[2]].name(), "Vec<U8>");
+	assert_eq!(type_defs[field_ids[3]].name(), "Option<Box<Foo>>");
 }
 
 #[test]
@@ -110,9 +120,8 @@ fn struct_with_serde_field_rename() {
 		num: u8,
 	}
 
-	assert_eq!(Foo::name(), "Foo");
 	assert_eq!(
-		Foo::def(),
+		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
 			size: size_of::<Foo>(),
@@ -120,7 +129,7 @@ fn struct_with_serde_field_rename() {
 			fields: vec![DefStructField {
 				name: "num".to_string(),
 				js_name: "bar".to_string(),
-				type_name: "U8".to_string(),
+				type_id: 1,
 				offset: 0,
 				flatten: false,
 			}]
@@ -143,9 +152,8 @@ fn struct_with_serde_field_flatten() {
 		num: u8,
 	}
 
-	assert_eq!(Foo::name(), "Foo");
 	assert_eq!(
-		Foo::def(),
+		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
 			size: size_of::<Foo>(),
@@ -153,7 +161,7 @@ fn struct_with_serde_field_flatten() {
 			fields: vec![DefStructField {
 				name: "bar".to_string(),
 				js_name: "bar".to_string(),
-				type_name: "Bar".to_string(),
+				type_id: 1,
 				offset: 0,
 				flatten: true,
 			}]
@@ -176,9 +184,8 @@ fn struct_with_serde_field_rename_and_flatten() {
 		num: u8,
 	}
 
-	assert_eq!(Foo::name(), "Foo");
 	assert_eq!(
-		Foo::def(),
+		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
 			size: size_of::<Foo>(),
@@ -186,7 +193,7 @@ fn struct_with_serde_field_rename_and_flatten() {
 			fields: vec![DefStructField {
 				name: "bar".to_string(),
 				js_name: "qux".to_string(),
-				type_name: "Bar".to_string(),
+				type_id: 1,
 				offset: 0,
 				flatten: true,
 			}]
@@ -204,9 +211,8 @@ fn struct_with_serde_field_default() {
 		num: u8,
 	}
 
-	assert_eq!(Foo::name(), "Foo");
 	assert_eq!(
-		Foo::def(),
+		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
 			size: size_of::<Foo>(),
@@ -214,10 +220,20 @@ fn struct_with_serde_field_default() {
 			fields: vec![DefStructField {
 				name: "num".to_string(),
 				js_name: "num".to_string(),
-				type_name: "U8".to_string(),
+				type_id: 1,
 				offset: 0,
 				flatten: false,
 			}]
 		})
 	);
+}
+
+fn get_field_ids(struct_def: &DefType) -> Vec<usize> {
+	struct_def
+		.struct_ref()
+		.unwrap()
+		.fields
+		.iter()
+		.map(|field| field.type_id as usize)
+		.collect()
 }

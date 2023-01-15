@@ -8,7 +8,7 @@ use std::{
 
 use crate::{
 	defs::{DefPrimitive, DefType},
-	Inspect,
+	Inspect, TypesCollector,
 };
 
 macro_rules! primitive {
@@ -27,7 +27,7 @@ macro_rules! primitive_impl {
 				$name.to_string()
 			}
 
-			fn def() -> DefType {
+			fn def(_collector: &mut TypesCollector) -> DefType {
 				DefType::Primitive(DefPrimitive {
 					name: Self::name(),
 					size: mem::size_of::<$type>(),
