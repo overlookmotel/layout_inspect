@@ -1,5 +1,5 @@
 [workspace]
 members = [
-  "crates/struct_inspect",
-  "crates/struct_inspect_derive",
+  "struct_inspect",
+  "struct_inspect_derive",
 ]
