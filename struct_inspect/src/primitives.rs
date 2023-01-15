@@ -1,47 +1,47 @@
 use std::{
-    mem,
-    num::{
-        NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
-        NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize,
-    },
+	mem,
+	num::{
+		NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
+		NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize,
+	},
 };
 
 use crate::{
-    defs::{DefPrimitive, DefType},
-    Inspect,
+	defs::{DefPrimitive, DefType},
+	Inspect,
 };
 
 macro_rules! primitive {
-    ($type:ty) => {
-        primitive_impl! {$type, uppercase(stringify!($type))}
-    };
-    ($type:ty, $name:ty) => {
-        primitive_impl! {$type, stringify!($name)}
-    };
+	($type:ty) => {
+		primitive_impl! {$type, uppercase(stringify!($type))}
+	};
+	($type:ty, $name:ty) => {
+		primitive_impl! {$type, stringify!($name)}
+	};
 }
 
 macro_rules! primitive_impl {
-    ($type:ty, $name:expr) => {
-        impl Inspect for $type {
-            fn name() -> String {
-                $name.to_string()
-            }
+	($type:ty, $name:expr) => {
+		impl Inspect for $type {
+			fn name() -> String {
+				$name.to_string()
+			}
 
-            fn def() -> DefType {
-                DefType::Primitive(DefPrimitive {
-                    name: Self::name(),
-                    size: mem::size_of::<$type>(),
-                    align: mem::align_of::<$type>(),
-                })
-            }
-        }
-    };
+			fn def() -> DefType {
+				DefType::Primitive(DefPrimitive {
+					name: Self::name(),
+					size: mem::size_of::<$type>(),
+					align: mem::align_of::<$type>(),
+				})
+			}
+		}
+	};
 }
 
 fn uppercase(str: &str) -> String {
-    let mut chars: Vec<char> = str.chars().collect();
-    chars[0] = chars[0].to_uppercase().nth(0).unwrap();
-    chars.into_iter().collect()
+	let mut chars: Vec<char> = str.chars().collect();
+	chars[0] = chars[0].to_uppercase().nth(0).unwrap();
+	chars.into_iter().collect()
 }
 
 primitive!(u8);

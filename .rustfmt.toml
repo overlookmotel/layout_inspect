@@ -1,3 +1,5 @@
+hard_tabs = true
+tab_spaces = 2
 format_strings = true
 group_imports = "StdExternalCrate"
 hex_literal_case = "Lower"
