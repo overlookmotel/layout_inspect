@@ -1,4 +1,4 @@
-use std::collections::hash_map::HashMap;
+use std::{collections::hash_map::HashMap, fs, io, path::Path};
 
 // Used by `Inspect` derive macro
 #[doc(hidden)]
@@ -17,8 +17,21 @@ pub fn inspect<T: Inspect>() -> HashMap<String, DefType> {
 	types
 }
 
-pub fn types_to_json(types: &HashMap<String, DefType>) -> String {
-	serde_json::to_string(types).unwrap()
+pub fn write_types_to_json_file<P: AsRef<Path>>(
+	types: &HashMap<String, DefType>,
+	path: P,
+	pretty: bool,
+) -> io::Result<()> {
+	let json = types_to_json(&types, pretty);
+	fs::write(path, json)
+}
+
+pub fn types_to_json(types: &HashMap<String, DefType>, pretty: bool) -> String {
+	if pretty {
+		serde_json::to_string_pretty(types).unwrap()
+	} else {
+		serde_json::to_string(types).unwrap()
+	}
 }
 
 pub trait Inspect {
