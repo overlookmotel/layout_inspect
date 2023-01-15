@@ -11,6 +11,92 @@ pub enum DefType {
 	Enum(DefEnum),
 }
 
+impl DefType {
+	pub fn into_struct(self) -> Option<DefStruct> {
+		match self {
+			DefType::Struct(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn into_primitive(self) -> Option<DefPrimitive> {
+		match self {
+			DefType::Primitive(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn into_box(self) -> Option<DefBox> {
+		match self {
+			DefType::Box(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn into_vec(self) -> Option<DefVec> {
+		match self {
+			DefType::Vec(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn into_option(self) -> Option<DefOption> {
+		match self {
+			DefType::Option(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn into_enum(self) -> Option<DefEnum> {
+		match self {
+			DefType::Enum(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn struct_ref(&self) -> Option<&DefStruct> {
+		match self {
+			DefType::Struct(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn primitive_ref(&self) -> Option<&DefPrimitive> {
+		match self {
+			DefType::Primitive(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn box_ref(&self) -> Option<&DefBox> {
+		match self {
+			DefType::Box(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn vec_ref(&self) -> Option<&DefVec> {
+		match self {
+			DefType::Vec(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn option_ref(&self) -> Option<&DefOption> {
+		match self {
+			DefType::Option(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn enum_ref(&self) -> Option<&DefEnum> {
+		match self {
+			DefType::Enum(def) => Some(def),
+			_ => None,
+		}
+	}
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefStruct {
