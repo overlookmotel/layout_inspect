@@ -104,6 +104,8 @@ fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
 }
 
 // TODO Support fieldless enums with no value annotation - use discriminant
+// TODO Support `#[serde(rename_all = "camelCase")]` (and other cases)
+// https://serde.rs/container-attrs.html#rename_all
 
 fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
 	let mut next_discriminant: u64 = 0;

@@ -155,6 +155,8 @@ pub struct DefVec {
 	pub value_type_id: TypeId,
 }
 
+// TODO: Record `None` value
+
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct DefOption {
@@ -177,7 +179,7 @@ pub struct DefEnum {
 #[serde(rename_all = "camelCase")]
 pub struct DefEnumVariant {
 	pub name: String,
-	pub discriminant: u64,
+	pub discriminant: u64, // TODO `u32` would be sufficient, or use `usize`
 	pub value: Option<String>,
 	pub value_type_id: Option<TypeId>,
 }
