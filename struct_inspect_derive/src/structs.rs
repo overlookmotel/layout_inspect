@@ -1,23 +1,58 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{AttrStyle, DataStruct, Field, Fields, FieldsNamed, Ident, Lit, Meta, NestedMeta};
+use syn::{
+	parse_quote, AttrStyle, DataStruct, Field, Fields, FieldsNamed, GenericParam, Generics, Ident,
+	Lit, Meta, NestedMeta,
+};
 
-// TODO Support generic structs e.g. `struct Foo<T> { inner: T }`
 // TODO Support `#[serde(rename_all = "camelCase")]` (and other variants)
 // https://serde.rs/container-attrs.html#rename_all
 
-pub fn derive_struct(data: &DataStruct, type_ident: Ident) -> TokenStream {
+pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) -> TokenStream {
+	// Get field definitions
 	let field_defs: Vec<TokenStream> = match data.fields {
 		Fields::Named(ref fields) => get_named_field_defs(fields),
 		Fields::Unnamed(ref _fields) => todo!("Unnamed struct fields not supported"),
 		Fields::Unit => todo!("Unit struct fields not supported"),
 	};
 
+	// Add bound `Inspect` to type params
+	for param in &mut generics.params {
+		if let GenericParam::Type(ref mut type_param) = *param {
+			type_param
+				.bounds
+				.push(parse_quote!(::struct_inspect::Inspect));
+		}
+	}
+
+	// Create code for name
+	let sub_types: Vec<TokenStream> = generics
+		.params
+		.iter()
+		.filter_map(|param| match param {
+			GenericParam::Type(param) => {
+				dbg!(param);
+				let ident = &param.ident;
+				Some(quote! {&<#ident as ::struct_inspect::Inspect>::name() +})
+			}
+			_ => None,
+		})
+		.collect();
+
+	let sub_types_str = if !sub_types.is_empty() {
+		quote! {+ "<" + #(#sub_types)* ">"}
+	} else {
+		quote! {}
+	};
+
+	// Return `impl` code
+	let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
+
 	quote! {
 			#[automatically_derived]
-			impl ::struct_inspect::Inspect for #type_ident {
+			impl #impl_generics ::struct_inspect::Inspect for #ident #type_generics #where_clause {
 					fn name() -> ::std::string::String {
-							stringify!(#type_ident).to_string()
+							stringify!(#ident).to_string() #sub_types_str
 					}
 
 					fn def(collector: &mut ::struct_inspect::TypesCollector) -> ::struct_inspect::defs::DefType {
