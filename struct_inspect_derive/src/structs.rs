@@ -8,7 +8,7 @@ use syn::{AttrStyle, DataStruct, Field, Fields, FieldsNamed, Ident, Lit, Meta, N
 
 pub fn derive_struct(data: &DataStruct, type_ident: Ident) -> TokenStream {
 	let field_defs: Vec<TokenStream> = match data.fields {
-		Fields::Named(ref fields) => get_named_field_defs(fields, &type_ident),
+		Fields::Named(ref fields) => get_named_field_defs(fields),
 		Fields::Unnamed(ref _fields) => todo!("Unnamed struct fields not supported"),
 		Fields::Unit => todo!("Unit struct fields not supported"),
 	};
@@ -24,8 +24,8 @@ pub fn derive_struct(data: &DataStruct, type_ident: Ident) -> TokenStream {
 							::struct_inspect::defs::DefType::Struct(
 									::struct_inspect::defs::DefStruct {
 											name: Self::name(),
-											size: ::std::mem::size_of::<#type_ident>(),
-											align: ::std::mem::align_of::<#type_ident>(),
+											size: ::std::mem::size_of::<Self>(),
+											align: ::std::mem::align_of::<Self>(),
 											fields: vec![#(#field_defs),*],
 									}
 							)
@@ -34,15 +34,15 @@ pub fn derive_struct(data: &DataStruct, type_ident: Ident) -> TokenStream {
 	}
 }
 
-fn get_named_field_defs(fields: &FieldsNamed, type_ident: &Ident) -> Vec<TokenStream> {
+fn get_named_field_defs(fields: &FieldsNamed) -> Vec<TokenStream> {
 	fields
 		.named
 		.iter()
-		.map(|field| get_named_field_def(field, type_ident))
+		.map(|field| get_named_field_def(field))
 		.collect()
 }
 
-fn get_named_field_def(field: &Field, type_ident: &Ident) -> TokenStream {
+fn get_named_field_def(field: &Field) -> TokenStream {
 	// Get field name
 	let name = field.ident.as_ref().expect("Missing field name");
 
@@ -91,7 +91,7 @@ fn get_named_field_def(field: &Field, type_ident: &Ident) -> TokenStream {
 					name: stringify!(#name).to_string(),
 					js_name: #js_name.to_string(),
 					type_id: collector.collect::<#ty>(),
-					offset: ::struct_inspect::__offset_of!(#type_ident, #name),
+					offset: ::struct_inspect::__offset_of!(Self, #name),
 					flatten: #flatten,
 			}
 	}

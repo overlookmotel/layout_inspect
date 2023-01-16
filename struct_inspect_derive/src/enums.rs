@@ -106,8 +106,8 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 							::struct_inspect::defs::DefType::Enum(
 									::struct_inspect::defs::DefEnum {
 											name: Self::name(),
-											size: ::std::mem::size_of::<#type_ident>(),
-											align: ::std::mem::align_of::<#type_ident>(),
+											size: ::std::mem::size_of::<Self>(),
+											align: ::std::mem::align_of::<Self>(),
 											variants: ::std::vec![#(#variant_defs),*],
 									}
 							)
