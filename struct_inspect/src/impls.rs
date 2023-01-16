@@ -1,4 +1,4 @@
-use std::mem;
+use std::mem::{align_of, size_of};
 
 use crate::{
 	defs::{DefBox, DefOption, DefType, DefVec},
@@ -13,8 +13,8 @@ impl<T: Inspect> Inspect for Box<T> {
 	fn def(collector: &mut TypesCollector) -> DefType {
 		DefType::Box(DefBox {
 			name: Self::name(),
-			size: mem::size_of::<Box<T>>(),
-			align: mem::align_of::<Box<T>>(),
+			size: size_of::<Self>(),
+			align: align_of::<Self>(),
 			value_type_id: collector.collect::<T>(),
 		})
 	}
@@ -28,8 +28,8 @@ impl<T: Inspect> Inspect for Vec<T> {
 	fn def(collector: &mut TypesCollector) -> DefType {
 		DefType::Vec(DefVec {
 			name: Self::name(),
-			size: mem::size_of::<Vec<T>>(),
-			align: mem::align_of::<Vec<T>>(),
+			size: size_of::<Self>(),
+			align: align_of::<Self>(),
 			value_type_id: collector.collect::<T>(),
 		})
 	}
@@ -43,8 +43,8 @@ impl<T: Inspect> Inspect for Option<T> {
 	fn def(collector: &mut TypesCollector) -> DefType {
 		DefType::Option(DefOption {
 			name: Self::name(),
-			size: mem::size_of::<Option<T>>(),
-			align: mem::align_of::<Option<T>>(),
+			size: size_of::<Self>(),
+			align: align_of::<Self>(),
 			value_type_id: collector.collect::<T>(),
 		})
 	}

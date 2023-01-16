@@ -1,5 +1,5 @@
 use std::{
-	mem,
+	mem::{align_of, size_of},
 	num::{
 		NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
 		NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize,
@@ -30,8 +30,8 @@ macro_rules! primitive_impl {
 			fn def(_collector: &mut TypesCollector) -> DefType {
 				DefType::Primitive(DefPrimitive {
 					name: Self::name(),
-					size: mem::size_of::<$type>(),
-					align: mem::align_of::<$type>(),
+					size: size_of::<Self>(),
+					align: align_of::<Self>(),
 				})
 			}
 		}
