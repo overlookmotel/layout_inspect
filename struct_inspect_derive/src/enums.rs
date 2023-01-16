@@ -80,26 +80,23 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 			};
 			next_discriminant = discriminant + 1;
 
-			let type_ident_str = variant.ident.to_string();
-			let variant_def = quote! {
+			let variant_ident = &variant.ident;
+			quote! {
 					::struct_inspect::defs::DefEnumVariant {
-							name: #type_ident_str.to_string(),
+							name: stringify!(#variant_ident).to_string(),
 							discriminant: #discriminant,
 							value: #value,
 							value_type_id: #value_type_id,
 					}
-			};
-
-			variant_def
+			}
 		})
 		.collect();
 
-	let type_ident_str = type_ident.to_string();
 	quote! {
 			#[automatically_derived]
 			impl Inspect for #type_ident {
 					fn name() -> ::std::string::String {
-							#type_ident_str.to_string()
+							stringify!(#type_ident).to_string()
 					}
 
 					fn def(collector: &mut ::struct_inspect::TypesCollector) -> ::struct_inspect::defs::DefType {
