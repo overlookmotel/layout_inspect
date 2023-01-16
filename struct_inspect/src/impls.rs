@@ -5,47 +5,25 @@ use crate::{
 	Inspect, TypesCollector,
 };
 
-impl<T: Inspect> Inspect for Box<T> {
-	fn name() -> String {
-		"Box<".to_string() + &T::name() + ">"
-	}
+macro_rules! single_type_param {
+	($name:ident, $def:ident) => {
+		impl<T: Inspect> Inspect for $name<T> {
+			fn name() -> String {
+				stringify!($name).to_string() + "<" + &T::name() + ">"
+			}
 
-	fn def(collector: &mut TypesCollector) -> DefType {
-		DefType::Box(DefBox {
-			name: Self::name(),
-			size: size_of::<Self>(),
-			align: align_of::<Self>(),
-			value_type_id: collector.collect::<T>(),
-		})
-	}
+			fn def(collector: &mut TypesCollector) -> DefType {
+				DefType::$name($def {
+					name: Self::name(),
+					size: size_of::<Self>(),
+					align: align_of::<Self>(),
+					value_type_id: collector.collect::<T>(),
+				})
+			}
+		}
+	};
 }
 
-impl<T: Inspect> Inspect for Vec<T> {
-	fn name() -> String {
-		"Vec<".to_string() + &T::name() + ">"
-	}
-
-	fn def(collector: &mut TypesCollector) -> DefType {
-		DefType::Vec(DefVec {
-			name: Self::name(),
-			size: size_of::<Self>(),
-			align: align_of::<Self>(),
-			value_type_id: collector.collect::<T>(),
-		})
-	}
-}
-
-impl<T: Inspect> Inspect for Option<T> {
-	fn name() -> String {
-		"Option<".to_string() + &T::name() + ">"
-	}
-
-	fn def(collector: &mut TypesCollector) -> DefType {
-		DefType::Option(DefOption {
-			name: Self::name(),
-			size: size_of::<Self>(),
-			align: align_of::<Self>(),
-			value_type_id: collector.collect::<T>(),
-		})
-	}
-}
+single_type_param!(Box, DefBox);
+single_type_param!(Vec, DefVec);
+single_type_param!(Option, DefOption);
