@@ -4,7 +4,7 @@ use syn::{AttrStyle, DataStruct, Fields, Ident, Lit, Meta, NestedMeta};
 
 // TODO Support generic structs e.g. `struct Foo<T> { inner: T }`
 
-pub fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
+pub fn derive_struct(data: &DataStruct, type_ident: Ident) -> TokenStream {
 	let field_defs: Vec<TokenStream> = match data.fields {
 		Fields::Named(ref fields) => fields
 			.named
@@ -51,7 +51,7 @@ pub fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
 								name: #name_str.to_string(),
 								js_name: #js_name_str.to_string(),
 								type_id: collector.collect::<#ty>(),
-								offset: ::struct_inspect::__offset_of!(#type_name, #name),
+								offset: ::struct_inspect::__offset_of!(#type_ident, #name),
 								flatten: #flatten,
 						}
 				}
@@ -61,20 +61,20 @@ pub fn derive_struct(data: &DataStruct, type_name: Ident) -> TokenStream {
 		Fields::Unit => todo!(),
 	};
 
-	let type_name_str = type_name.to_string();
+	let type_ident_str = type_ident.to_string();
 	quote! {
 			#[automatically_derived]
-			impl ::struct_inspect::Inspect for #type_name {
+			impl ::struct_inspect::Inspect for #type_ident {
 					fn name() -> ::std::string::String {
-							#type_name_str.to_string()
+							#type_ident_str.to_string()
 					}
 
 					fn def(collector: &mut ::struct_inspect::TypesCollector) -> ::struct_inspect::defs::DefType {
 							::struct_inspect::defs::DefType::Struct(
 									::struct_inspect::defs::DefStruct {
 											name: Self::name(),
-											size: ::std::mem::size_of::<#type_name>(),
-											align: ::std::mem::align_of::<#type_name>(),
+											size: ::std::mem::size_of::<#type_ident>(),
+											align: ::std::mem::align_of::<#type_ident>(),
 											fields: vec![#(#field_defs),*],
 									}
 							)

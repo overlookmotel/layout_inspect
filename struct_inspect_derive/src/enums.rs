@@ -8,7 +8,7 @@ use syn::{AttrStyle, DataEnum, Expr, Fields, Ident, Lit, Meta};
 // TODO Support `#[serde(rename_all = "camelCase")]` (and other cases)
 // https://serde.rs/container-attrs.html#rename_all
 
-pub fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
+pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
 
 	let variant_defs: Vec<_> = data
@@ -25,7 +25,7 @@ pub fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
 					assert!(
 						doc_comments.len() == 1,
 						"{} enum {} option has {} value doc comment",
-						type_name,
+						type_ident,
 						variant.ident,
 						match doc_comments.len() {
 							0 => "no",
@@ -39,12 +39,12 @@ pub fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
 							Lit::Str(s) => s.value(),
 							_ => panic!(
 								"Unexpected value doc comment for {} enum {} option",
-								type_name, variant.ident
+								type_ident, variant.ident
 							),
 						},
 						_ => panic!(
 							"Unexpected value doc comment for {} enum {} option",
-							type_name, variant.ident
+							type_ident, variant.ident
 						),
 					};
 
@@ -80,10 +80,10 @@ pub fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
 			};
 			next_discriminant = discriminant + 1;
 
-			let type_name_str = variant.ident.to_string();
+			let type_ident_str = variant.ident.to_string();
 			let variant_def = quote! {
 					::struct_inspect::defs::DefEnumVariant {
-							name: #type_name_str.to_string(),
+							name: #type_ident_str.to_string(),
 							discriminant: #discriminant,
 							value: #value,
 							value_type_id: #value_type_id,
@@ -94,20 +94,20 @@ pub fn derive_enum(data: &DataEnum, type_name: Ident) -> TokenStream {
 		})
 		.collect();
 
-	let type_name_str = type_name.to_string();
+	let type_ident_str = type_ident.to_string();
 	quote! {
 			#[automatically_derived]
-			impl Inspect for #type_name {
+			impl Inspect for #type_ident {
 					fn name() -> ::std::string::String {
-							#type_name_str.to_string()
+							#type_ident_str.to_string()
 					}
 
 					fn def(collector: &mut ::struct_inspect::TypesCollector) -> ::struct_inspect::defs::DefType {
 							::struct_inspect::defs::DefType::Enum(
 									::struct_inspect::defs::DefEnum {
 											name: Self::name(),
-											size: ::std::mem::size_of::<#type_name>(),
-											align: ::std::mem::align_of::<#type_name>(),
+											size: ::std::mem::size_of::<#type_ident>(),
+											align: ::std::mem::align_of::<#type_ident>(),
 											variants: ::std::vec![#(#variant_defs),*],
 									}
 							)
