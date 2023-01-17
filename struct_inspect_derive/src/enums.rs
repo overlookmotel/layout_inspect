@@ -8,7 +8,7 @@ use syn::{AttrStyle, DataEnum, Expr, Fields, Ident, Lit, Meta};
 // TODO Support `#[serde(rename_all = "camelCase")]` (and other cases)
 // https://serde.rs/container-attrs.html#rename_all
 
-pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
+pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
 
 	let variant_defs: Vec<_> = data
@@ -25,7 +25,7 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 					assert!(
 						doc_comments.len() == 1,
 						"{} enum {} option has {} value doc comment",
-						type_ident,
+						ident,
 						variant.ident,
 						match doc_comments.len() {
 							0 => "no",
@@ -39,12 +39,12 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 							Lit::Str(s) => s.value(),
 							_ => panic!(
 								"Unexpected value doc comment for {} enum {} option",
-								type_ident, variant.ident
+								ident, variant.ident
 							),
 						},
 						_ => panic!(
 							"Unexpected value doc comment for {} enum {} option",
-							type_ident, variant.ident
+							ident, variant.ident
 						),
 					};
 
@@ -94,9 +94,9 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 
 	quote! {
 			#[automatically_derived]
-			impl Inspect for #type_ident {
+			impl Inspect for #ident {
 					fn name() -> ::std::string::String {
-							stringify!(#type_ident).to_string()
+							stringify!(#ident).to_string()
 					}
 
 					fn def(collector: &mut ::struct_inspect::TypesCollector) -> ::struct_inspect::defs::DefType {
