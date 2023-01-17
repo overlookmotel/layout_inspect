@@ -15,6 +15,22 @@ pub enum DefType {
 	String(DefString),
 }
 
+macro_rules! getter {
+	($field:ident, $rtn_type:ty, $out:expr) => {
+		pub fn $field(&self) -> $rtn_type {
+			match &self {
+				DefType::Struct(DefStruct { $field, .. }) => $out,
+				DefType::Primitive(DefPrimitive { $field, .. }) => $out,
+				DefType::Box(DefBox { $field, .. }) => $out,
+				DefType::Vec(DefVec { $field, .. }) => $out,
+				DefType::Option(DefOption { $field, .. }) => $out,
+				DefType::Enum(DefEnum { $field, .. }) => $out,
+				DefType::String(DefString { $field, .. }) => $out,
+			}
+		}
+	};
+}
+
 macro_rules! to_methods {
 	($name:ident, $def:ty, $into:ident, $ref:ident) => {
 		pub fn $into(self) -> Option<$def> {
@@ -34,6 +50,12 @@ macro_rules! to_methods {
 }
 
 impl DefType {
+	getter!(name, &str, &name[..]);
+
+	getter!(size, usize, *size);
+
+	getter!(align, usize, *align);
+
 	to_methods!(Primitive, DefPrimitive, into_primitive, to_primitive);
 
 	to_methods!(Struct, DefStruct, into_struct, to_struct);
@@ -47,42 +69,6 @@ impl DefType {
 	to_methods!(Option, DefOption, into_option, to_option);
 
 	to_methods!(String, DefString, into_string, to_string);
-
-	pub fn name(&self) -> &str {
-		match &self {
-			DefType::Struct(DefStruct { name, .. }) => &name[..],
-			DefType::Primitive(DefPrimitive { name, .. }) => &name[..],
-			DefType::Box(DefBox { name, .. }) => &name[..],
-			DefType::Vec(DefVec { name, .. }) => &name[..],
-			DefType::Option(DefOption { name, .. }) => &name[..],
-			DefType::Enum(DefEnum { name, .. }) => &name[..],
-			DefType::String(DefString { name, .. }) => &name[..],
-		}
-	}
-
-	pub fn size(&self) -> usize {
-		match &self {
-			DefType::Struct(DefStruct { size, .. }) => *size,
-			DefType::Primitive(DefPrimitive { size, .. }) => *size,
-			DefType::Box(DefBox { size, .. }) => *size,
-			DefType::Vec(DefVec { size, .. }) => *size,
-			DefType::Option(DefOption { size, .. }) => *size,
-			DefType::Enum(DefEnum { size, .. }) => *size,
-			DefType::String(DefString { size, .. }) => *size,
-		}
-	}
-
-	pub fn align(&self) -> usize {
-		match &self {
-			DefType::Struct(DefStruct { align, .. }) => *align,
-			DefType::Primitive(DefPrimitive { align, .. }) => *align,
-			DefType::Box(DefBox { align, .. }) => *align,
-			DefType::Vec(DefVec { align, .. }) => *align,
-			DefType::Option(DefOption { align, .. }) => *align,
-			DefType::Enum(DefEnum { align, .. }) => *align,
-			DefType::String(DefString { align, .. }) => *align,
-		}
-	}
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
