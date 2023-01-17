@@ -15,7 +15,39 @@ pub enum DefType {
 	String(DefString),
 }
 
+macro_rules! to_methods {
+	($name:ident, $def:ty, $into:ident, $ref:ident) => {
+		pub fn $into(self) -> Option<$def> {
+			match self {
+				DefType::$name(def) => Some(def),
+				_ => None,
+			}
+		}
+
+		pub fn $ref(&self) -> Option<&$def> {
+			match self {
+				DefType::$name(def) => Some(def),
+				_ => None,
+			}
+		}
+	};
+}
+
 impl DefType {
+	to_methods!(Primitive, DefPrimitive, into_primitive, primitive_ref);
+
+	to_methods!(Struct, DefStruct, into_struct, struct_ref);
+
+	to_methods!(Enum, DefEnum, into_enum, enum_ref);
+
+	to_methods!(Box, DefBox, into_box, box_ref);
+
+	to_methods!(Vec, DefVec, into_vec, vec_ref);
+
+	to_methods!(Option, DefOption, into_option, option_ref);
+
+	to_methods!(String, DefString, into_string, string_ref);
+
 	pub fn name(&self) -> &str {
 		match &self {
 			DefType::Struct(DefStruct { name, .. }) => &name[..],
@@ -49,104 +81,6 @@ impl DefType {
 			DefType::Option(DefOption { align, .. }) => *align,
 			DefType::Enum(DefEnum { align, .. }) => *align,
 			DefType::String(DefString { align, .. }) => *align,
-		}
-	}
-
-	pub fn into_primitive(self) -> Option<DefPrimitive> {
-		match self {
-			DefType::Primitive(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn into_struct(self) -> Option<DefStruct> {
-		match self {
-			DefType::Struct(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn into_enum(self) -> Option<DefEnum> {
-		match self {
-			DefType::Enum(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn into_box(self) -> Option<DefBox> {
-		match self {
-			DefType::Box(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn into_vec(self) -> Option<DefVec> {
-		match self {
-			DefType::Vec(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn into_option(self) -> Option<DefOption> {
-		match self {
-			DefType::Option(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn into_string(self) -> Option<DefString> {
-		match self {
-			DefType::String(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn primitive_ref(&self) -> Option<&DefPrimitive> {
-		match self {
-			DefType::Primitive(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn struct_ref(&self) -> Option<&DefStruct> {
-		match self {
-			DefType::Struct(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn enum_ref(&self) -> Option<&DefEnum> {
-		match self {
-			DefType::Enum(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn box_ref(&self) -> Option<&DefBox> {
-		match self {
-			DefType::Box(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn vec_ref(&self) -> Option<&DefVec> {
-		match self {
-			DefType::Vec(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn option_ref(&self) -> Option<&DefOption> {
-		match self {
-			DefType::Option(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn string_ref(&self) -> Option<&DefString> {
-		match self {
-			DefType::String(def) => Some(def),
-			_ => None,
 		}
 	}
 }
