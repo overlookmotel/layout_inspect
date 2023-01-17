@@ -415,7 +415,7 @@ fn struct_with_serde_field_default() {
 
 fn get_field_ids(struct_def: &DefType) -> Vec<usize> {
 	struct_def
-		.struct_ref()
+		.to_struct()
 		.unwrap()
 		.fields
 		.iter()

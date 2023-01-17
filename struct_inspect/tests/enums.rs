@@ -194,7 +194,7 @@ fn enum_mixed_fieldless_and_fieldful() {
 
 fn get_variant_ids(enum_def: &DefType) -> Vec<Option<usize>> {
 	enum_def
-		.enum_ref()
+		.to_enum()
 		.unwrap()
 		.variants
 		.iter()

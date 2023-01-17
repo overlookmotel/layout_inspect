@@ -34,19 +34,19 @@ macro_rules! to_methods {
 }
 
 impl DefType {
-	to_methods!(Primitive, DefPrimitive, into_primitive, primitive_ref);
+	to_methods!(Primitive, DefPrimitive, into_primitive, to_primitive);
 
-	to_methods!(Struct, DefStruct, into_struct, struct_ref);
+	to_methods!(Struct, DefStruct, into_struct, to_struct);
 
-	to_methods!(Enum, DefEnum, into_enum, enum_ref);
+	to_methods!(Enum, DefEnum, into_enum, to_enum);
 
-	to_methods!(Box, DefBox, into_box, box_ref);
+	to_methods!(Box, DefBox, into_box, to_box);
 
-	to_methods!(Vec, DefVec, into_vec, vec_ref);
+	to_methods!(Vec, DefVec, into_vec, to_vec);
 
-	to_methods!(Option, DefOption, into_option, option_ref);
+	to_methods!(Option, DefOption, into_option, to_option);
 
-	to_methods!(String, DefString, into_string, string_ref);
+	to_methods!(String, DefString, into_string, to_string);
 
 	pub fn name(&self) -> &str {
 		match &self {
