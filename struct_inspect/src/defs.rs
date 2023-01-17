@@ -94,6 +94,13 @@ impl DefType {
 		}
 	}
 
+	pub fn into_string(self) -> Option<DefString> {
+		match self {
+			DefType::String(def) => Some(def),
+			_ => None,
+		}
+	}
+
 	pub fn primitive_ref(&self) -> Option<&DefPrimitive> {
 		match self {
 			DefType::Primitive(def) => Some(def),
@@ -132,6 +139,13 @@ impl DefType {
 	pub fn option_ref(&self) -> Option<&DefOption> {
 		match self {
 			DefType::Option(def) => Some(def),
+			_ => None,
+		}
+	}
+
+	pub fn string_ref(&self) -> Option<&DefString> {
+		match self {
+			DefType::String(def) => Some(def),
 			_ => None,
 		}
 	}
