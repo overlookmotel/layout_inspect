@@ -31,7 +31,6 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 		.iter()
 		.filter_map(|param| match param {
 			GenericParam::Type(param) => {
-				dbg!(param);
 				let ident = &param.ident;
 				Some(quote! {&<#ident as ::struct_inspect::Inspect>::name() +})
 			}
@@ -40,6 +39,11 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 		.collect();
 
 	let sub_types_str = if !sub_types.is_empty() {
+		let mut sub_types: Vec<_> = sub_types
+			.into_iter()
+			.flat_map(|sub_type| [sub_type, quote! {"," +}])
+			.collect();
+		sub_types.pop();
 		quote! {+ "<" + #(#sub_types)* ">"}
 	} else {
 		quote! {}
