@@ -52,6 +52,13 @@ impl DefType {
 		}
 	}
 
+	pub fn into_primitive(self) -> Option<DefPrimitive> {
+		match self {
+			DefType::Primitive(def) => Some(def),
+			_ => None,
+		}
+	}
+
 	pub fn into_struct(self) -> Option<DefStruct> {
 		match self {
 			DefType::Struct(def) => Some(def),
@@ -59,9 +66,9 @@ impl DefType {
 		}
 	}
 
-	pub fn into_primitive(self) -> Option<DefPrimitive> {
+	pub fn into_enum(self) -> Option<DefEnum> {
 		match self {
-			DefType::Primitive(def) => Some(def),
+			DefType::Enum(def) => Some(def),
 			_ => None,
 		}
 	}
@@ -87,9 +94,9 @@ impl DefType {
 		}
 	}
 
-	pub fn into_enum(self) -> Option<DefEnum> {
+	pub fn primitive_ref(&self) -> Option<&DefPrimitive> {
 		match self {
-			DefType::Enum(def) => Some(def),
+			DefType::Primitive(def) => Some(def),
 			_ => None,
 		}
 	}
@@ -101,9 +108,9 @@ impl DefType {
 		}
 	}
 
-	pub fn primitive_ref(&self) -> Option<&DefPrimitive> {
+	pub fn enum_ref(&self) -> Option<&DefEnum> {
 		match self {
-			DefType::Primitive(def) => Some(def),
+			DefType::Enum(def) => Some(def),
 			_ => None,
 		}
 	}
@@ -125,13 +132,6 @@ impl DefType {
 	pub fn option_ref(&self) -> Option<&DefOption> {
 		match self {
 			DefType::Option(def) => Some(def),
-			_ => None,
-		}
-	}
-
-	pub fn enum_ref(&self) -> Option<&DefEnum> {
-		match self {
-			DefType::Enum(def) => Some(def),
 			_ => None,
 		}
 	}
