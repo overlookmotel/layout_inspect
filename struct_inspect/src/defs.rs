@@ -11,6 +11,7 @@ pub enum DefType {
 	Vec(DefVec),
 	Option(DefOption),
 	Enum(DefEnum),
+	String(DefString),
 }
 
 impl DefType {
@@ -22,6 +23,7 @@ impl DefType {
 			DefType::Vec(DefVec { name, .. }) => &name[..],
 			DefType::Option(DefOption { name, .. }) => &name[..],
 			DefType::Enum(DefEnum { name, .. }) => &name[..],
+			DefType::String(DefString { name, .. }) => &name[..],
 		}
 	}
 
@@ -182,4 +184,12 @@ pub struct DefEnumVariant {
 	pub discriminant: u64, // TODO `u32` would be sufficient, or use `usize`
 	pub value: Option<String>,
 	pub value_type_id: Option<TypeId>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct DefString {
+	pub name: String,
+	pub size: usize,
+	pub align: usize,
 }
