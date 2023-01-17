@@ -6,30 +6,30 @@ use super::TypeId;
 #[serde(tag = "kind")]
 #[serde(rename_all = "camelCase")]
 pub enum DefType {
-	Struct(DefStruct),
 	Primitive(DefPrimitive),
+	Struct(DefStruct),
+	Enum(DefEnum),
+	String(DefString),
 	Box(DefBox),
 	Vec(DefVec),
 	Option(DefOption),
 	PhantomData(DefPhantomData),
 	Result(DefResult),
-	Enum(DefEnum),
-	String(DefString),
 }
 
 macro_rules! getter {
 	($field:ident, $rtn_type:ty, $out:expr) => {
 		pub fn $field(&self) -> $rtn_type {
 			match &self {
-				DefType::Struct(DefStruct { $field, .. }) => $out,
 				DefType::Primitive(DefPrimitive { $field, .. }) => $out,
+				DefType::Struct(DefStruct { $field, .. }) => $out,
+				DefType::Enum(DefEnum { $field, .. }) => $out,
+				DefType::String(DefString { $field, .. }) => $out,
 				DefType::Box(DefBox { $field, .. }) => $out,
 				DefType::Vec(DefVec { $field, .. }) => $out,
 				DefType::Option(DefOption { $field, .. }) => $out,
 				DefType::PhantomData(DefPhantomData { $field, .. }) => $out,
 				DefType::Result(DefResult { $field, .. }) => $out,
-				DefType::Enum(DefEnum { $field, .. }) => $out,
-				DefType::String(DefString { $field, .. }) => $out,
 			}
 		}
 	};
@@ -66,6 +66,8 @@ impl DefType {
 
 	to_methods!(Enum, DefEnum, into_enum, to_enum);
 
+	to_methods!(String, DefString, into_string, to_string);
+
 	to_methods!(Box, DefBox, into_box, to_box);
 
 	to_methods!(Vec, DefVec, into_vec, to_vec);
@@ -80,8 +82,6 @@ impl DefType {
 	);
 
 	to_methods!(Result, DefResult, into_result, to_result);
-
-	to_methods!(String, DefString, into_string, to_string);
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
