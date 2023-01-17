@@ -119,7 +119,7 @@ fn unit() {
 	assert_eq!(
 		inspect::<()>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "Unit".to_string(),
+			name: "()".to_string(),
 			size: 0,
 			align: 1,
 		})

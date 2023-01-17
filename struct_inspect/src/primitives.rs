@@ -13,18 +13,9 @@ use crate::{
 
 macro_rules! primitive {
 	($type:ty) => {
-		primitive_impl! {$type, stringify!($type)}
-	};
-	($type:ty, $name:ty) => {
-		primitive_impl! {$type, stringify!($name)}
-	};
-}
-
-macro_rules! primitive_impl {
-	($type:ty, $name:expr) => {
 		impl Inspect for $type {
 			fn name() -> String {
-				$name.to_string()
+				stringify!($type).to_string()
 			}
 
 			fn def(_collector: &mut TypesCollector) -> DefType {
@@ -72,4 +63,4 @@ primitive!(f64);
 primitive!(bool);
 primitive!(char);
 
-primitive!((), Unit);
+primitive!(());
