@@ -158,34 +158,22 @@ pub struct DefEnumVariant {
 	pub value_type_id: Option<TypeId>,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DefBox {
-	pub name: String,
-	pub size: usize,
-	pub align: usize,
-	pub value_type_id: TypeId,
+macro_rules! single_type_param {
+	($def:ident) => {
+		#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
+		#[serde(rename_all = "camelCase")]
+		pub struct $def {
+			pub name: String,
+			pub size: usize,
+			pub align: usize,
+			pub value_type_id: TypeId,
+		}
+	};
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DefVec {
-	pub name: String,
-	pub size: usize,
-	pub align: usize,
-	pub value_type_id: TypeId,
-}
-
-// TODO: Record `None` value
-
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DefOption {
-	pub name: String,
-	pub size: usize,
-	pub align: usize,
-	pub value_type_id: TypeId,
-}
+single_type_param!(DefBox);
+single_type_param!(DefVec);
+single_type_param!(DefOption);
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
 #[serde(rename_all = "camelCase")]
