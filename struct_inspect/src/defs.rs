@@ -4,6 +4,7 @@ use super::TypeId;
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
 #[serde(tag = "kind")]
+#[serde(rename_all = "camelCase")]
 pub enum DefType {
 	Struct(DefStruct),
 	Primitive(DefPrimitive),
