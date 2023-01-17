@@ -111,6 +111,191 @@ fn struct_multiple_fields() {
 }
 
 #[test]
+fn struct_generic_one_type_param() {
+	#[derive(Inspect)]
+	struct Foo {
+		big: Bar<u32>,
+		small: Bar<u8>,
+	}
+
+	#[derive(Inspect)]
+	struct Bar<T> {
+		inner: T,
+	}
+
+	let type_defs = inspect::<Foo>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			size: size_of::<Foo>(),
+			align: align_of::<Foo>(),
+			fields: vec![
+				DefStructField {
+					name: "big".to_string(),
+					js_name: "big".to_string(),
+					type_id: 1,
+					offset: 0,
+					flatten: false
+				},
+				DefStructField {
+					name: "small".to_string(),
+					js_name: "small".to_string(),
+					type_id: 3,
+					offset: size_of::<Bar<u32>>(),
+					flatten: false
+				}
+			]
+		})
+	);
+
+	let foo_field_ids = get_field_ids(&type_defs[0]);
+	let bar_u32_def = &type_defs[foo_field_ids[0]];
+	assert_eq!(
+		bar_u32_def,
+		&DefType::Struct(DefStruct {
+			name: "Bar<U32>".to_string(),
+			size: size_of::<Bar<u32>>(),
+			align: align_of::<Bar<u32>>(),
+			fields: vec![DefStructField {
+				name: "inner".to_string(),
+				js_name: "inner".to_string(),
+				type_id: 2,
+				offset: 0,
+				flatten: false
+			}]
+		})
+	);
+
+	let u32_id = get_field_ids(bar_u32_def)[0];
+	assert_eq!(type_defs[u32_id].name(), "U32");
+
+	let bar_u8_def = &type_defs[foo_field_ids[1]];
+	assert_eq!(
+		bar_u8_def,
+		&DefType::Struct(DefStruct {
+			name: "Bar<U8>".to_string(),
+			size: size_of::<Bar<u8>>(),
+			align: align_of::<Bar<u8>>(),
+			fields: vec![DefStructField {
+				name: "inner".to_string(),
+				js_name: "inner".to_string(),
+				type_id: 4,
+				offset: 0,
+				flatten: false
+			}]
+		})
+	);
+
+	let u8_id = get_field_ids(bar_u8_def)[0];
+	assert_eq!(type_defs[u8_id].name(), "U8");
+}
+
+#[test]
+fn struct_generic_two_type_params() {
+	#[derive(Inspect)]
+	struct Foo {
+		big: Bar<u64, u32>,
+		small: Bar<u16, u8>,
+	}
+
+	#[derive(Inspect)]
+	struct Bar<T, U> {
+		one: T,
+		two: U,
+	}
+
+	let type_defs = inspect::<Foo>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			size: size_of::<Foo>(),
+			align: align_of::<Foo>(),
+			fields: vec![
+				DefStructField {
+					name: "big".to_string(),
+					js_name: "big".to_string(),
+					type_id: 1,
+					offset: 0,
+					flatten: false
+				},
+				DefStructField {
+					name: "small".to_string(),
+					js_name: "small".to_string(),
+					type_id: 4,
+					offset: size_of::<Bar<u64, u32>>(),
+					flatten: false
+				}
+			]
+		})
+	);
+
+	let foo_field_ids = get_field_ids(&type_defs[0]);
+	let bar_u64_u32_def = &type_defs[foo_field_ids[0]];
+	assert_eq!(
+		bar_u64_u32_def,
+		&DefType::Struct(DefStruct {
+			name: "Bar<U64,U32>".to_string(),
+			size: size_of::<Bar<u64, u32>>(),
+			align: align_of::<Bar<u64, u32>>(),
+			fields: vec![
+				DefStructField {
+					name: "one".to_string(),
+					js_name: "one".to_string(),
+					type_id: 2,
+					offset: 0,
+					flatten: false
+				},
+				DefStructField {
+					name: "two".to_string(),
+					js_name: "two".to_string(),
+					type_id: 3,
+					offset: size_of::<u64>(),
+					flatten: false
+				}
+			]
+		})
+	);
+
+	let bar_u64_u32_field_ids = get_field_ids(bar_u64_u32_def);
+	assert_eq!(type_defs[bar_u64_u32_field_ids[0]].name(), "U64");
+	assert_eq!(type_defs[bar_u64_u32_field_ids[1]].name(), "U32");
+
+	let bar_u16_u8_def = &type_defs[foo_field_ids[1]];
+	assert_eq!(
+		bar_u16_u8_def,
+		&DefType::Struct(DefStruct {
+			name: "Bar<U16,U8>".to_string(),
+			size: size_of::<Bar<u16, u8>>(),
+			align: align_of::<Bar<u16, u8>>(),
+			fields: vec![
+				DefStructField {
+					name: "one".to_string(),
+					js_name: "one".to_string(),
+					type_id: 5,
+					offset: 0,
+					flatten: false
+				},
+				DefStructField {
+					name: "two".to_string(),
+					js_name: "two".to_string(),
+					type_id: 6,
+					offset: size_of::<u16>(),
+					flatten: false
+				}
+			]
+		})
+	);
+
+	let bar_u16_u8_field_ids = get_field_ids(bar_u16_u8_def);
+	assert_eq!(type_defs[bar_u16_u8_field_ids[0]].name(), "U16");
+	assert_eq!(type_defs[bar_u16_u8_field_ids[1]].name(), "U8");
+}
+
+#[test]
 fn struct_with_serde_field_rename() {
 	use serde::{Deserialize, Serialize};
 
