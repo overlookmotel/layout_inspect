@@ -115,6 +115,14 @@ impl DefType {
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct DefPrimitive {
+	pub name: String,
+	pub size: usize,
+	pub align: usize,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct DefStruct {
 	pub name: String,
 	pub size: usize,
@@ -134,10 +142,20 @@ pub struct DefStructField {
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct DefPrimitive {
+pub struct DefEnum {
 	pub name: String,
 	pub size: usize,
 	pub align: usize,
+	pub variants: Vec<DefEnumVariant>,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct DefEnumVariant {
+	pub name: String,
+	pub discriminant: u64, // TODO `u32` would be sufficient, or use `usize`
+	pub ser_value: Option<String>,
+	pub value_type_id: Option<TypeId>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
@@ -167,24 +185,6 @@ pub struct DefOption {
 	pub size: usize,
 	pub align: usize,
 	pub value_type_id: TypeId,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DefEnum {
-	pub name: String,
-	pub size: usize,
-	pub align: usize,
-	pub variants: Vec<DefEnumVariant>,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct DefEnumVariant {
-	pub name: String,
-	pub discriminant: u64, // TODO `u32` would be sufficient, or use `usize`
-	pub ser_value: Option<String>,
-	pub value_type_id: Option<TypeId>,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
