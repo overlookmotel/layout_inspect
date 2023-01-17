@@ -11,6 +11,8 @@ pub enum DefType {
 	Box(DefBox),
 	Vec(DefVec),
 	Option(DefOption),
+	PhantomData(DefPhantomData),
+	Result(DefResult),
 	Enum(DefEnum),
 	String(DefString),
 }
@@ -24,6 +26,8 @@ macro_rules! getter {
 				DefType::Box(DefBox { $field, .. }) => $out,
 				DefType::Vec(DefVec { $field, .. }) => $out,
 				DefType::Option(DefOption { $field, .. }) => $out,
+				DefType::PhantomData(DefPhantomData { $field, .. }) => $out,
+				DefType::Result(DefResult { $field, .. }) => $out,
 				DefType::Enum(DefEnum { $field, .. }) => $out,
 				DefType::String(DefString { $field, .. }) => $out,
 			}
@@ -67,6 +71,15 @@ impl DefType {
 	to_methods!(Vec, DefVec, into_vec, to_vec);
 
 	to_methods!(Option, DefOption, into_option, to_option);
+
+	to_methods!(
+		PhantomData,
+		DefPhantomData,
+		into_phantom_data,
+		to_phantom_data
+	);
+
+	to_methods!(Result, DefResult, into_result, to_result);
 
 	to_methods!(String, DefString, into_string, to_string);
 }
@@ -132,6 +145,23 @@ macro_rules! single_type_param {
 single_type_param!(DefBox);
 single_type_param!(DefVec);
 single_type_param!(DefOption);
+single_type_param!(DefPhantomData);
+
+macro_rules! double_type_param {
+	($def:ident, $field1:ident, $field2:ident) => {
+		#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
+		#[serde(rename_all = "camelCase")]
+		pub struct $def {
+			pub name: String,
+			pub size: usize,
+			pub align: usize,
+			pub $field1: TypeId,
+			pub $field2: TypeId,
+		}
+	};
+}
+
+double_type_param!(DefResult, ok_type_id, err_type_id);
 
 #[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
 #[serde(rename_all = "camelCase")]

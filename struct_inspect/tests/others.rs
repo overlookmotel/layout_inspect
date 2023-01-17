@@ -1,7 +1,7 @@
 use std::mem::{align_of, size_of};
 
 use struct_inspect::{
-	defs::{DefString, DefType},
+	defs::{DefPhantomData, DefResult, DefString, DefType},
 	inspect,
 };
 
@@ -15,4 +15,42 @@ fn string() {
 			align: align_of::<String>(),
 		})
 	);
+}
+
+#[test]
+fn phantom_data() {
+	use std::marker::PhantomData;
+
+	let type_defs = inspect::<PhantomData<u128>>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::PhantomData(DefPhantomData {
+			name: "PhantomData<u128>".to_string(),
+			size: 0,
+			align: 1,
+			value_type_id: 1,
+		})
+	);
+
+	assert_eq!(type_defs[1].name(), "u128");
+}
+
+#[test]
+fn result() {
+	let type_defs = inspect::<Result<u8, u16>>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::Result(DefResult {
+			name: "Result<u8,u16>".to_string(),
+			size: size_of::<Result<u8, u16>>(),
+			align: align_of::<Result<u8, u16>>(),
+			ok_type_id: 1,
+			err_type_id: 2,
+		})
+	);
+
+	assert_eq!(type_defs[1].name(), "u8");
+	assert_eq!(type_defs[2].name(), "u16");
 }

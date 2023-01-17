@@ -1,7 +1,10 @@
-use std::mem::{align_of, size_of};
+use std::{
+	marker::PhantomData,
+	mem::{align_of, size_of},
+};
 
 use crate::{
-	defs::{DefBox, DefOption, DefString, DefType, DefVec},
+	defs::{DefBox, DefOption, DefPhantomData, DefResult, DefString, DefType, DefVec},
 	Inspect, TypesCollector,
 };
 
@@ -27,6 +30,29 @@ macro_rules! single_type_param {
 single_type_param!(Box, DefBox);
 single_type_param!(Vec, DefVec);
 single_type_param!(Option, DefOption);
+single_type_param!(PhantomData, DefPhantomData);
+
+macro_rules! double_type_param {
+	($name:ident, $def:ident, $field1:ident, $field2:ident) => {
+		impl<T: Inspect, T2: Inspect> Inspect for $name<T, T2> {
+			fn name() -> String {
+				stringify!($name).to_string() + "<" + &T::name() + "," + &T2::name() + ">"
+			}
+
+			fn def(collector: &mut TypesCollector) -> DefType {
+				DefType::$name($def {
+					name: Self::name(),
+					size: size_of::<Self>(),
+					align: align_of::<Self>(),
+					$field1: collector.collect::<T>(),
+					$field2: collector.collect::<T2>(),
+				})
+			}
+		}
+	};
+}
+
+double_type_param!(Result, DefResult, ok_type_id, err_type_id);
 
 impl Inspect for String {
 	fn name() -> String {
