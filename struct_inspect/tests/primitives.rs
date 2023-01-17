@@ -10,7 +10,7 @@ fn u8() {
 	assert_eq!(
 		inspect::<u8>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "U8".to_string(),
+			name: "u8".to_string(),
 			size: size_of::<u8>(),
 			align: align_of::<u8>(),
 		})
@@ -22,7 +22,7 @@ fn u32() {
 	assert_eq!(
 		inspect::<u32>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "U32".to_string(),
+			name: "u32".to_string(),
 			size: size_of::<u32>(),
 			align: align_of::<u32>(),
 		})
@@ -34,7 +34,7 @@ fn u128() {
 	assert_eq!(
 		inspect::<u128>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "U128".to_string(),
+			name: "u128".to_string(),
 			size: size_of::<u128>(),
 			align: align_of::<u128>(),
 		})
@@ -46,7 +46,7 @@ fn i8() {
 	assert_eq!(
 		inspect::<i8>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "I8".to_string(),
+			name: "i8".to_string(),
 			size: size_of::<i8>(),
 			align: align_of::<i8>(),
 		})
@@ -58,7 +58,7 @@ fn f64() {
 	assert_eq!(
 		inspect::<f64>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "F64".to_string(),
+			name: "f64".to_string(),
 			size: size_of::<f64>(),
 			align: align_of::<f64>(),
 		})
@@ -70,7 +70,7 @@ fn usize() {
 	assert_eq!(
 		inspect::<usize>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "Usize".to_string(),
+			name: "usize".to_string(),
 			size: size_of::<usize>(),
 			align: align_of::<usize>(),
 		})
@@ -82,7 +82,7 @@ fn isize() {
 	assert_eq!(
 		inspect::<isize>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "Isize".to_string(),
+			name: "isize".to_string(),
 			size: size_of::<isize>(),
 			align: align_of::<isize>(),
 		})
@@ -107,7 +107,7 @@ fn bool() {
 	assert_eq!(
 		inspect::<bool>()[0],
 		DefType::Primitive(DefPrimitive {
-			name: "Bool".to_string(),
+			name: "bool".to_string(),
 			size: size_of::<bool>(),
 			align: align_of::<bool>(),
 		})

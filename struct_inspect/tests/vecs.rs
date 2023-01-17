@@ -12,14 +12,14 @@ fn vec_primitive() {
 	assert_eq!(
 		&type_defs[0],
 		&DefType::Vec(DefVec {
-			name: "Vec<U8>".to_string(),
+			name: "Vec<u8>".to_string(),
 			size: size_of::<usize>() * 3,
 			align: align_of::<usize>(),
 			value_type_id: 1,
 		})
 	);
 
-	assert_eq!(type_defs[1].name(), "U8");
+	assert_eq!(type_defs[1].name(), "u8");
 }
 
 #[test]

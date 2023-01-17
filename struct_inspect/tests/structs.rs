@@ -33,7 +33,7 @@ fn struct_single_field() {
 	);
 
 	let field_ids = get_field_ids(&type_defs[0]);
-	assert_eq!(type_defs[field_ids[0]].name(), "U8");
+	assert_eq!(type_defs[field_ids[0]].name(), "u8");
 }
 
 #[test]
@@ -104,9 +104,9 @@ fn struct_multiple_fields() {
 	);
 
 	let field_ids = get_field_ids(&type_defs[0]);
-	assert_eq!(type_defs[field_ids[0]].name(), "U8");
-	assert_eq!(type_defs[field_ids[1]].name(), "U16");
-	assert_eq!(type_defs[field_ids[2]].name(), "Vec<U8>");
+	assert_eq!(type_defs[field_ids[0]].name(), "u8");
+	assert_eq!(type_defs[field_ids[1]].name(), "u16");
+	assert_eq!(type_defs[field_ids[2]].name(), "Vec<u8>");
 	assert_eq!(type_defs[field_ids[3]].name(), "Option<Box<Foo>>");
 }
 
@@ -155,7 +155,7 @@ fn struct_generic_one_type_param() {
 	assert_eq!(
 		bar_u32_def,
 		&DefType::Struct(DefStruct {
-			name: "Bar<U32>".to_string(),
+			name: "Bar<u32>".to_string(),
 			size: size_of::<Bar<u32>>(),
 			align: align_of::<Bar<u32>>(),
 			fields: vec![DefStructField {
@@ -169,13 +169,13 @@ fn struct_generic_one_type_param() {
 	);
 
 	let u32_id = get_field_ids(bar_u32_def)[0];
-	assert_eq!(type_defs[u32_id].name(), "U32");
+	assert_eq!(type_defs[u32_id].name(), "u32");
 
 	let bar_u8_def = &type_defs[foo_field_ids[1]];
 	assert_eq!(
 		bar_u8_def,
 		&DefType::Struct(DefStruct {
-			name: "Bar<U8>".to_string(),
+			name: "Bar<u8>".to_string(),
 			size: size_of::<Bar<u8>>(),
 			align: align_of::<Bar<u8>>(),
 			fields: vec![DefStructField {
@@ -189,7 +189,7 @@ fn struct_generic_one_type_param() {
 	);
 
 	let u8_id = get_field_ids(bar_u8_def)[0];
-	assert_eq!(type_defs[u8_id].name(), "U8");
+	assert_eq!(type_defs[u8_id].name(), "u8");
 }
 
 #[test]
@@ -238,7 +238,7 @@ fn struct_generic_two_type_params() {
 	assert_eq!(
 		bar_u64_u32_def,
 		&DefType::Struct(DefStruct {
-			name: "Bar<U64,U32>".to_string(),
+			name: "Bar<u64,u32>".to_string(),
 			size: size_of::<Bar<u64, u32>>(),
 			align: align_of::<Bar<u64, u32>>(),
 			fields: vec![
@@ -261,14 +261,14 @@ fn struct_generic_two_type_params() {
 	);
 
 	let bar_u64_u32_field_ids = get_field_ids(bar_u64_u32_def);
-	assert_eq!(type_defs[bar_u64_u32_field_ids[0]].name(), "U64");
-	assert_eq!(type_defs[bar_u64_u32_field_ids[1]].name(), "U32");
+	assert_eq!(type_defs[bar_u64_u32_field_ids[0]].name(), "u64");
+	assert_eq!(type_defs[bar_u64_u32_field_ids[1]].name(), "u32");
 
 	let bar_u16_u8_def = &type_defs[foo_field_ids[1]];
 	assert_eq!(
 		bar_u16_u8_def,
 		&DefType::Struct(DefStruct {
-			name: "Bar<U16,U8>".to_string(),
+			name: "Bar<u16,u8>".to_string(),
 			size: size_of::<Bar<u16, u8>>(),
 			align: align_of::<Bar<u16, u8>>(),
 			fields: vec![
@@ -291,8 +291,8 @@ fn struct_generic_two_type_params() {
 	);
 
 	let bar_u16_u8_field_ids = get_field_ids(bar_u16_u8_def);
-	assert_eq!(type_defs[bar_u16_u8_field_ids[0]].name(), "U16");
-	assert_eq!(type_defs[bar_u16_u8_field_ids[1]].name(), "U8");
+	assert_eq!(type_defs[bar_u16_u8_field_ids[0]].name(), "u16");
+	assert_eq!(type_defs[bar_u16_u8_field_ids[1]].name(), "u8");
 }
 
 #[test]

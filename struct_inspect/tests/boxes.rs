@@ -12,14 +12,14 @@ fn boxed_primitive() {
 	assert_eq!(
 		&type_defs[0],
 		&DefType::Box(DefBox {
-			name: "Box<U8>".to_string(),
+			name: "Box<u8>".to_string(),
 			size: size_of::<usize>(),
 			align: align_of::<usize>(),
 			value_type_id: 1,
 		})
 	);
 
-	assert_eq!(type_defs[1].name(), "U8");
+	assert_eq!(type_defs[1].name(), "u8");
 }
 
 #[test]

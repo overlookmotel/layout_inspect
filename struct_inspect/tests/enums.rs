@@ -142,8 +142,8 @@ fn enum_fieldful() {
 	);
 
 	let variant_ids = get_variant_ids(&type_defs[0]);
-	assert_eq!(type_defs[variant_ids[0].unwrap()].name(), "U8");
-	assert_eq!(type_defs[variant_ids[1].unwrap()].name(), "U16");
+	assert_eq!(type_defs[variant_ids[0].unwrap()].name(), "u8");
+	assert_eq!(type_defs[variant_ids[1].unwrap()].name(), "u16");
 }
 
 #[test]
@@ -182,7 +182,7 @@ fn enum_mixed_fieldless_and_fieldful() {
 	);
 
 	let variant_ids = get_variant_ids(&type_defs[0]);
-	assert_eq!(type_defs[variant_ids[1].unwrap()].name(), "U8");
+	assert_eq!(type_defs[variant_ids[1].unwrap()].name(), "u8");
 
 	// Check discriminants are correct
 	fn to_bytes(foo: Foo) -> [u8; 2] {

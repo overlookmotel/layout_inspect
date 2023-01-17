@@ -13,7 +13,7 @@ use crate::{
 
 macro_rules! primitive {
 	($type:ty) => {
-		primitive_impl! {$type, uppercase(stringify!($type))}
+		primitive_impl! {$type, stringify!($type)}
 	};
 	($type:ty, $name:ty) => {
 		primitive_impl! {$type, stringify!($name)}
@@ -36,12 +36,6 @@ macro_rules! primitive_impl {
 			}
 		}
 	};
-}
-
-fn uppercase(str: &str) -> String {
-	let mut chars: Vec<char> = str.chars().collect();
-	chars[0] = chars[0].to_uppercase().nth(0).unwrap();
-	chars.into_iter().collect()
 }
 
 primitive!(u8);

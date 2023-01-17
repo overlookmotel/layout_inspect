@@ -12,14 +12,14 @@ fn option_primitive() {
 	assert_eq!(
 		&type_defs[0],
 		&DefType::Option(DefOption {
-			name: "Option<U8>".to_string(),
+			name: "Option<u8>".to_string(),
 			size: size_of::<u8>() * 2,
 			align: align_of::<u8>(),
 			value_type_id: 1,
 		})
 	);
 
-	assert_eq!(type_defs[1].name(), "U8");
+	assert_eq!(type_defs[1].name(), "u8");
 }
 
 #[test]
@@ -29,14 +29,14 @@ fn option_primitive_with_niche() {
 	assert_eq!(
 		&type_defs[0],
 		&DefType::Option(DefOption {
-			name: "Option<Bool>".to_string(),
+			name: "Option<bool>".to_string(),
 			size: size_of::<bool>(),
 			align: align_of::<bool>(),
 			value_type_id: 1,
 		})
 	);
 
-	assert_eq!(type_defs[1].name(), "Bool");
+	assert_eq!(type_defs[1].name(), "bool");
 }
 
 #[test]
@@ -94,14 +94,14 @@ fn option_box() {
 	assert_eq!(
 		&type_defs[0],
 		&DefType::Option(DefOption {
-			name: "Option<Box<U8>>".to_string(),
+			name: "Option<Box<u8>>".to_string(),
 			size: size_of::<usize>(),
 			align: align_of::<usize>(),
 			value_type_id: 1,
 		})
 	);
 
-	assert_eq!(type_defs[1].name(), "Box<U8>");
+	assert_eq!(type_defs[1].name(), "Box<u8>");
 }
 
 #[test]
@@ -111,12 +111,12 @@ fn option_vec() {
 	assert_eq!(
 		&type_defs[0],
 		&DefType::Option(DefOption {
-			name: "Option<Vec<U8>>".to_string(),
+			name: "Option<Vec<u8>>".to_string(),
 			size: size_of::<usize>() * 3,
 			align: align_of::<usize>(),
 			value_type_id: 1,
 		})
 	);
 
-	assert_eq!(type_defs[1].name(), "Vec<U8>");
+	assert_eq!(type_defs[1].name(), "Vec<u8>");
 }
