@@ -14,6 +14,12 @@ pub enum DefType {
 	Vec(DefVec),
 	Option(DefOption),
 	PhantomData(DefPhantomData),
+	Cell(DefCell),
+	RefCell(DefRefCell),
+	Mutex(DefMutex),
+	RwLock(DefRwLock),
+	Rc(DefRc),
+	Arc(DefArc),
 	Result(DefResult),
 }
 
@@ -29,6 +35,12 @@ macro_rules! getter {
 				DefType::Vec(DefVec { $field, .. }) => $out,
 				DefType::Option(DefOption { $field, .. }) => $out,
 				DefType::PhantomData(DefPhantomData { $field, .. }) => $out,
+				DefType::Cell(DefCell { $field, .. }) => $out,
+				DefType::RefCell(DefRefCell { $field, .. }) => $out,
+				DefType::Mutex(DefMutex { $field, .. }) => $out,
+				DefType::RwLock(DefRwLock { $field, .. }) => $out,
+				DefType::Rc(DefRc { $field, .. }) => $out,
+				DefType::Arc(DefArc { $field, .. }) => $out,
 				DefType::Result(DefResult { $field, .. }) => $out,
 			}
 		}
@@ -80,6 +92,18 @@ impl DefType {
 		into_phantom_data,
 		to_phantom_data
 	);
+
+	to_methods!(Cell, DefCell, into_cell, to_cell);
+
+	to_methods!(RefCell, DefRefCell, into_ref_cell, to_ref_cell);
+
+	to_methods!(Mutex, DefMutex, into_mutex, to_mutex);
+
+	to_methods!(RwLock, DefRwLock, into_rw_lock, to_rw_lock);
+
+	to_methods!(Rc, DefRc, into_rc, to_rc);
+
+	to_methods!(Arc, DefArc, into_arc, to_arc);
 
 	to_methods!(Result, DefResult, into_result, to_result);
 }
@@ -146,6 +170,12 @@ single_type_param!(DefBox);
 single_type_param!(DefVec);
 single_type_param!(DefOption);
 single_type_param!(DefPhantomData);
+single_type_param!(DefCell);
+single_type_param!(DefRefCell);
+single_type_param!(DefMutex);
+single_type_param!(DefRwLock);
+single_type_param!(DefRc);
+single_type_param!(DefArc);
 
 macro_rules! double_type_param {
 	($def:ident, $field1:ident, $field2:ident) => {

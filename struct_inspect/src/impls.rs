@@ -1,10 +1,16 @@
 use std::{
+	cell::{Cell, RefCell},
 	marker::PhantomData,
 	mem::{align_of, size_of},
+	rc::Rc,
+	sync::{Arc, Mutex, RwLock},
 };
 
 use crate::{
-	defs::{DefBox, DefOption, DefPhantomData, DefResult, DefString, DefType, DefVec},
+	defs::{
+		DefArc, DefBox, DefCell, DefMutex, DefOption, DefPhantomData, DefRc, DefRefCell, DefResult,
+		DefRwLock, DefString, DefType, DefVec,
+	},
 	Inspect, TypesCollector,
 };
 
@@ -45,6 +51,12 @@ single_type_param!(Box, DefBox);
 single_type_param!(Vec, DefVec);
 single_type_param!(Option, DefOption);
 single_type_param!(PhantomData, DefPhantomData);
+single_type_param!(Cell, DefCell);
+single_type_param!(RefCell, DefRefCell);
+single_type_param!(Mutex, DefMutex);
+single_type_param!(RwLock, DefRwLock);
+single_type_param!(Rc, DefRc);
+single_type_param!(Arc, DefArc);
 
 macro_rules! double_type_param {
 	($name:ident, $def:ident, $field1:ident, $field2:ident) => {
