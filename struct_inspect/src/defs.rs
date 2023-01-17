@@ -28,6 +28,30 @@ impl DefType {
 		}
 	}
 
+	pub fn size(&self) -> usize {
+		match &self {
+			DefType::Struct(DefStruct { size, .. }) => *size,
+			DefType::Primitive(DefPrimitive { size, .. }) => *size,
+			DefType::Box(DefBox { size, .. }) => *size,
+			DefType::Vec(DefVec { size, .. }) => *size,
+			DefType::Option(DefOption { size, .. }) => *size,
+			DefType::Enum(DefEnum { size, .. }) => *size,
+			DefType::String(DefString { size, .. }) => *size,
+		}
+	}
+
+	pub fn align(&self) -> usize {
+		match &self {
+			DefType::Struct(DefStruct { align, .. }) => *align,
+			DefType::Primitive(DefPrimitive { align, .. }) => *align,
+			DefType::Box(DefBox { align, .. }) => *align,
+			DefType::Vec(DefVec { align, .. }) => *align,
+			DefType::Option(DefOption { align, .. }) => *align,
+			DefType::Enum(DefEnum { align, .. }) => *align,
+			DefType::String(DefString { align, .. }) => *align,
+		}
+	}
+
 	pub fn into_struct(self) -> Option<DefStruct> {
 		match self {
 			DefType::Struct(def) => Some(def),
