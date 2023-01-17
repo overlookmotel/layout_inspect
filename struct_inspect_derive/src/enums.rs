@@ -15,7 +15,7 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 		.variants
 		.iter()
 		.map(|variant| {
-			let (value, value_type_id) = match &variant.fields {
+			let (ser_value, value_type_id) = match &variant.fields {
 				Fields::Unit => {
 					let doc_comments: Vec<_> = variant
 						.attrs
@@ -34,7 +34,7 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 					);
 
 					let meta = doc_comments[0].parse_meta().unwrap();
-					let value = match meta {
+					let ser_value = match meta {
 						Meta::NameValue(name_value) => match &name_value.lit {
 							Lit::Str(s) => s.value(),
 							_ => panic!(
@@ -49,21 +49,21 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 					};
 
 					let regex = Regex::new("^ `(.+)`$").unwrap();
-					let value = &regex.captures(&value).unwrap()[1];
+					let ser_value = &regex.captures(&ser_value).unwrap()[1];
 
-					let value = quote! { ::std::option::Option::Some(#value.to_string()) };
+					let ser_value = quote! { ::std::option::Option::Some(#ser_value.to_string()) };
 					let value_type_id = quote! { ::std::option::Option::None };
-					(value, value_type_id)
+					(ser_value, value_type_id)
 				}
 				Fields::Unnamed(ref fields) => {
 					let unnamed = &fields.unnamed;
 					assert!(unnamed.len() == 1);
 					let ty = &unnamed.first().unwrap().ty;
-					let value = quote! { ::std::option::Option::None };
+					let ser_value = quote! { ::std::option::Option::None };
 					let value_type_id = quote! {
 							::std::option::Option::Some(collector.collect::<#ty>())
 					};
-					(value, value_type_id)
+					(ser_value, value_type_id)
 				}
 				Fields::Named(_) => todo!(),
 			};
@@ -85,7 +85,7 @@ pub fn derive_enum(data: &DataEnum, type_ident: Ident) -> TokenStream {
 					::struct_inspect::defs::DefEnumVariant {
 							name: stringify!(#variant_ident).to_string(),
 							discriminant: #discriminant,
-							value: #value,
+							ser_value: #ser_value,
 							value_type_id: #value_type_id,
 					}
 			}

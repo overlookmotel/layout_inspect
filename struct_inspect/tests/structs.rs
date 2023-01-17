@@ -24,7 +24,7 @@ fn struct_single_field() {
 			align: align_of::<Foo>(),
 			fields: vec![DefStructField {
 				name: "num".to_string(),
-				js_name: "num".to_string(),
+				ser_name: "num".to_string(),
 				type_id: 1,
 				offset: 0,
 				flatten: false,
@@ -73,28 +73,28 @@ fn struct_multiple_fields() {
 			fields: vec![
 				DefStructField {
 					name: "small".to_string(),
-					js_name: "small".to_string(),
+					ser_name: "small".to_string(),
 					type_id: 1,
 					offset: size_of::<usize>() * 4 + size_of::<u16>(),
 					flatten: false
 				},
 				DefStructField {
 					name: "medium".to_string(),
-					js_name: "medium".to_string(),
+					ser_name: "medium".to_string(),
 					type_id: 2,
 					offset: size_of::<usize>() * 4,
 					flatten: false
 				},
 				DefStructField {
 					name: "veccy".to_string(),
-					js_name: "veccy".to_string(),
+					ser_name: "veccy".to_string(),
 					type_id: 3,
 					offset: 0,
 					flatten: false
 				},
 				DefStructField {
 					name: "recurse".to_string(),
-					js_name: "recurse".to_string(),
+					ser_name: "recurse".to_string(),
 					type_id: 4,
 					offset: size_of::<usize>() * 3,
 					flatten: false
@@ -134,14 +134,14 @@ fn struct_generic_one_type_param() {
 			fields: vec![
 				DefStructField {
 					name: "big".to_string(),
-					js_name: "big".to_string(),
+					ser_name: "big".to_string(),
 					type_id: 1,
 					offset: 0,
 					flatten: false
 				},
 				DefStructField {
 					name: "small".to_string(),
-					js_name: "small".to_string(),
+					ser_name: "small".to_string(),
 					type_id: 3,
 					offset: size_of::<Bar<u32>>(),
 					flatten: false
@@ -160,7 +160,7 @@ fn struct_generic_one_type_param() {
 			align: align_of::<Bar<u32>>(),
 			fields: vec![DefStructField {
 				name: "inner".to_string(),
-				js_name: "inner".to_string(),
+				ser_name: "inner".to_string(),
 				type_id: 2,
 				offset: 0,
 				flatten: false
@@ -180,7 +180,7 @@ fn struct_generic_one_type_param() {
 			align: align_of::<Bar<u8>>(),
 			fields: vec![DefStructField {
 				name: "inner".to_string(),
-				js_name: "inner".to_string(),
+				ser_name: "inner".to_string(),
 				type_id: 4,
 				offset: 0,
 				flatten: false
@@ -217,14 +217,14 @@ fn struct_generic_two_type_params() {
 			fields: vec![
 				DefStructField {
 					name: "big".to_string(),
-					js_name: "big".to_string(),
+					ser_name: "big".to_string(),
 					type_id: 1,
 					offset: 0,
 					flatten: false
 				},
 				DefStructField {
 					name: "small".to_string(),
-					js_name: "small".to_string(),
+					ser_name: "small".to_string(),
 					type_id: 4,
 					offset: size_of::<Bar<u64, u32>>(),
 					flatten: false
@@ -244,14 +244,14 @@ fn struct_generic_two_type_params() {
 			fields: vec![
 				DefStructField {
 					name: "one".to_string(),
-					js_name: "one".to_string(),
+					ser_name: "one".to_string(),
 					type_id: 2,
 					offset: 0,
 					flatten: false
 				},
 				DefStructField {
 					name: "two".to_string(),
-					js_name: "two".to_string(),
+					ser_name: "two".to_string(),
 					type_id: 3,
 					offset: size_of::<u64>(),
 					flatten: false
@@ -274,14 +274,14 @@ fn struct_generic_two_type_params() {
 			fields: vec![
 				DefStructField {
 					name: "one".to_string(),
-					js_name: "one".to_string(),
+					ser_name: "one".to_string(),
 					type_id: 5,
 					offset: 0,
 					flatten: false
 				},
 				DefStructField {
 					name: "two".to_string(),
-					js_name: "two".to_string(),
+					ser_name: "two".to_string(),
 					type_id: 6,
 					offset: size_of::<u16>(),
 					flatten: false
@@ -313,7 +313,7 @@ fn struct_with_serde_field_rename() {
 			align: align_of::<Foo>(),
 			fields: vec![DefStructField {
 				name: "num".to_string(),
-				js_name: "bar".to_string(),
+				ser_name: "bar".to_string(),
 				type_id: 1,
 				offset: 0,
 				flatten: false,
@@ -345,7 +345,7 @@ fn struct_with_serde_field_flatten() {
 			align: align_of::<Foo>(),
 			fields: vec![DefStructField {
 				name: "bar".to_string(),
-				js_name: "bar".to_string(),
+				ser_name: "bar".to_string(),
 				type_id: 1,
 				offset: 0,
 				flatten: true,
@@ -377,7 +377,7 @@ fn struct_with_serde_field_rename_and_flatten() {
 			align: align_of::<Foo>(),
 			fields: vec![DefStructField {
 				name: "bar".to_string(),
-				js_name: "qux".to_string(),
+				ser_name: "qux".to_string(),
 				type_id: 1,
 				offset: 0,
 				flatten: true,
@@ -404,7 +404,7 @@ fn struct_with_serde_field_default() {
 			align: align_of::<Foo>(),
 			fields: vec![DefStructField {
 				name: "num".to_string(),
-				js_name: "num".to_string(),
+				ser_name: "num".to_string(),
 				type_id: 1,
 				offset: 0,
 				flatten: false,

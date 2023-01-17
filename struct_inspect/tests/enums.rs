@@ -26,13 +26,13 @@ fn enum_fieldless() {
 				DefEnumVariant {
 					name: "Opt1".to_string(),
 					discriminant: 0,
-					value: Some("o1".to_string()),
+					ser_value: Some("o1".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt2".to_string(),
 					discriminant: 1,
-					value: Some("o2".to_string()),
+					ser_value: Some("o2".to_string()),
 					value_type_id: None
 				},
 			],
@@ -72,25 +72,25 @@ fn enum_fieldless_with_discriminants() {
 				DefEnumVariant {
 					name: "Opt1".to_string(),
 					discriminant: 5,
-					value: Some("o1".to_string()),
+					ser_value: Some("o1".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt2".to_string(),
 					discriminant: 10,
-					value: Some("o2".to_string()),
+					ser_value: Some("o2".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt3".to_string(),
 					discriminant: 11,
-					value: Some("o3".to_string()),
+					ser_value: Some("o3".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt4".to_string(),
 					discriminant: 12,
-					value: Some("o4".to_string()),
+					ser_value: Some("o4".to_string()),
 					value_type_id: None
 				},
 			],
@@ -128,13 +128,13 @@ fn enum_fieldful() {
 				DefEnumVariant {
 					name: "Opt1".to_string(),
 					discriminant: 0,
-					value: None,
+					ser_value: None,
 					value_type_id: Some(1)
 				},
 				DefEnumVariant {
 					name: "Opt2".to_string(),
 					discriminant: 1,
-					value: None,
+					ser_value: None,
 					value_type_id: Some(2)
 				},
 			],
@@ -168,13 +168,13 @@ fn enum_mixed_fieldless_and_fieldful() {
 				DefEnumVariant {
 					name: "Opt1".to_string(),
 					discriminant: 0,
-					value: Some("o1".to_string()),
+					ser_value: Some("o1".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt2".to_string(),
 					discriminant: 1,
-					value: None,
+					ser_value: None,
 					value_type_id: Some(1)
 				},
 			],

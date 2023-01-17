@@ -125,7 +125,7 @@ pub struct DefStruct {
 #[serde(rename_all = "camelCase")]
 pub struct DefStructField {
 	pub name: String,
-	pub js_name: String,
+	pub ser_name: String,
 	pub type_id: TypeId,
 	pub offset: usize,
 	pub flatten: bool,
@@ -182,7 +182,7 @@ pub struct DefEnum {
 pub struct DefEnumVariant {
 	pub name: String,
 	pub discriminant: u64, // TODO `u32` would be sufficient, or use `usize`
-	pub value: Option<String>,
+	pub ser_value: Option<String>,
 	pub value_type_id: Option<TypeId>,
 }
 

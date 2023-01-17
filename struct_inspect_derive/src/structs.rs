@@ -86,7 +86,7 @@ fn get_named_field_def(field: &Field) -> TokenStream {
 	let name = field.ident.as_ref().expect("Missing field name");
 
 	// Search field attributes for `#[serde(rename = "x")]` or `#[serde(flatten)]`
-	let mut js_name: Option<String> = None;
+	let mut ser_name: Option<String> = None;
 	let mut flatten = false;
 
 	for attr in &field.attrs {
@@ -101,7 +101,7 @@ fn get_named_field_def(field: &Field) -> TokenStream {
 								if name_value.path.is_ident("rename") {
 									match &name_value.lit {
 										Lit::Str(s) => {
-											js_name = Some(s.value());
+											ser_name = Some(s.value());
 										}
 										_ => panic!("Unexpected serde rename tag"),
 									}
@@ -121,14 +121,14 @@ fn get_named_field_def(field: &Field) -> TokenStream {
 		}
 	}
 
-	let js_name = js_name.unwrap_or_else(|| name.to_string());
+	let ser_name = ser_name.unwrap_or_else(|| name.to_string());
 
 	// Return field def
 	let ty = &field.ty;
 	quote! {
 			::struct_inspect::defs::DefStructField {
 					name: stringify!(#name).to_string(),
-					js_name: #js_name.to_string(),
+					ser_name: #ser_name.to_string(),
 					type_id: collector.collect::<#ty>(),
 					offset: ::struct_inspect::__offset_of!(Self, #name),
 					flatten: #flatten,
