@@ -99,12 +99,20 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 							stringify!(#ident).to_string()
 					}
 
+					fn size() -> Option<usize> {
+						Some(::std::mem::size_of::<Self>())
+					}
+
+					fn align() -> Option<usize> {
+						Some(::std::mem::align_of::<Self>())
+					}
+
 					fn def(collector: &mut ::layout_inspect::TypesCollector) -> ::layout_inspect::defs::DefType {
 							::layout_inspect::defs::DefType::Enum(
 									::layout_inspect::defs::DefEnum {
 											name: Self::name(),
-											size: ::std::mem::size_of::<Self>(),
-											align: ::std::mem::align_of::<Self>(),
+											size: Self::size().unwrap(),
+											align: Self::align().unwrap(),
 											variants: ::std::vec![#(#variant_defs),*],
 									}
 							)

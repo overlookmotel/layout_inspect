@@ -19,11 +19,19 @@ impl Inspectable for String {
 		"String".to_string()
 	}
 
+	fn size() -> Option<usize> {
+		Some(size_of::<Self>())
+	}
+
+	fn align() -> Option<usize> {
+		Some(align_of::<Self>())
+	}
+
 	fn def(_collector: &mut TypesCollector) -> DefType {
 		DefType::String(DefString {
 			name: Self::name(),
-			size: size_of::<Self>(),
-			align: align_of::<Self>(),
+			size: Self::size().unwrap(),
+			align: Self::align().unwrap(),
 		})
 	}
 }
@@ -35,11 +43,19 @@ macro_rules! single_type_param {
 				stringify!($name).to_string() + "<" + &T::name() + ">"
 			}
 
+			fn size() -> Option<usize> {
+				Some(size_of::<Self>())
+			}
+
+			fn align() -> Option<usize> {
+				Some(align_of::<Self>())
+			}
+
 			fn def(collector: &mut TypesCollector) -> DefType {
 				DefType::$name($def {
 					name: Self::name(),
-					size: size_of::<Self>(),
-					align: align_of::<Self>(),
+					size: Self::size().unwrap(),
+					align: Self::align().unwrap(),
 					value_type_id: collector.collect::<T>(),
 				})
 			}
@@ -65,11 +81,19 @@ macro_rules! double_type_param {
 				stringify!($name).to_string() + "<" + &T::name() + "," + &T2::name() + ">"
 			}
 
+			fn size() -> Option<usize> {
+				Some(size_of::<Self>())
+			}
+
+			fn align() -> Option<usize> {
+				Some(align_of::<Self>())
+			}
+
 			fn def(collector: &mut TypesCollector) -> DefType {
 				DefType::$name($def {
 					name: Self::name(),
-					size: size_of::<Self>(),
-					align: align_of::<Self>(),
+					size: Self::size().unwrap(),
+					align: Self::align().unwrap(),
 					$field1: collector.collect::<T>(),
 					$field2: collector.collect::<T2>(),
 				})

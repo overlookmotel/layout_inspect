@@ -18,11 +18,19 @@ macro_rules! primitive {
 				stringify!($type).to_string()
 			}
 
+			fn size() -> Option<usize> {
+				Some(size_of::<Self>())
+			}
+
+			fn align() -> Option<usize> {
+				Some(align_of::<Self>())
+			}
+
 			fn def(_collector: &mut TypesCollector) -> DefType {
 				DefType::Primitive(DefPrimitive {
 					name: Self::name(),
-					size: size_of::<Self>(),
-					align: align_of::<Self>(),
+					size: Self::size().unwrap(),
+					align: Self::align().unwrap(),
 				})
 			}
 		}

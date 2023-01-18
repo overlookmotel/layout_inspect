@@ -59,12 +59,22 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 							stringify!(#ident).to_string() #sub_types_str
 					}
 
+					// TODO Allow deriving for unsized types
+					// TODO Deduce alignment for unsized types where possible e.g. `struct X { n: u64, s: str }`
+					fn size() -> Option<usize> {
+						Some(::std::mem::size_of::<Self>())
+					}
+
+					fn align() -> Option<usize> {
+						Some(::std::mem::align_of::<Self>())
+					}
+
 					fn def(collector: &mut ::layout_inspect::TypesCollector) -> ::layout_inspect::defs::DefType {
 							::layout_inspect::defs::DefType::Struct(
 									::layout_inspect::defs::DefStruct {
 											name: Self::name(),
-											size: ::std::mem::size_of::<Self>(),
-											align: ::std::mem::align_of::<Self>(),
+											size: Self::size(),
+											align: Self::align(),
 											fields: vec![#(#field_defs),*],
 									}
 							)

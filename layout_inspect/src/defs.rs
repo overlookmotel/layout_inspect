@@ -25,10 +25,13 @@ pub enum DefType {
 
 macro_rules! getter {
 	($field:ident, $rtn_type:ty, $out:expr) => {
+		getter!($field, $rtn_type, $out, $out);
+	};
+	($field:ident, $rtn_type:ty, $out:expr, $unsized_out:expr) => {
 		pub fn $field(&self) -> $rtn_type {
 			match &self {
 				DefType::Primitive(DefPrimitive { $field, .. }) => $out,
-				DefType::Struct(DefStruct { $field, .. }) => $out,
+				DefType::Struct(DefStruct { $field, .. }) => $unsized_out,
 				DefType::Enum(DefEnum { $field, .. }) => $out,
 				DefType::String(DefString { $field, .. }) => $out,
 				DefType::Box(DefBox { $field, .. }) => $out,
@@ -68,9 +71,9 @@ macro_rules! to_methods {
 impl DefType {
 	getter!(name, &str, &name[..]);
 
-	getter!(size, usize, *size);
+	getter!(size, Option<usize>, Some(*size), *size);
 
-	getter!(align, usize, *align);
+	getter!(align, Option<usize>, Some(*align), *align);
 
 	to_methods!(Primitive, DefPrimitive, into_primitive, to_primitive);
 
@@ -120,8 +123,8 @@ pub struct DefPrimitive {
 #[serde(rename_all = "camelCase")]
 pub struct DefStruct {
 	pub name: String,
-	pub size: usize,
-	pub align: usize,
+	pub size: Option<usize>,
+	pub align: Option<usize>,
 	pub fields: Vec<DefStructField>,
 }
 

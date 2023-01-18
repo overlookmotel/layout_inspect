@@ -20,8 +20,8 @@ fn struct_single_field() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
 				name: "num".to_string(),
 				ser_name: "num".to_string(),
@@ -45,8 +45,8 @@ fn struct_empty() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: 0,
-			align: 1,
+			size: Some(0),
+			align: Some(1),
 			fields: vec![]
 		})
 	);
@@ -68,8 +68,8 @@ fn struct_multiple_fields() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![
 				DefStructField {
 					name: "small".to_string(),
@@ -129,8 +129,8 @@ fn struct_generic_one_type_param() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![
 				DefStructField {
 					name: "big".to_string(),
@@ -156,8 +156,8 @@ fn struct_generic_one_type_param() {
 		bar_u32_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u32>".to_string(),
-			size: size_of::<Bar<u32>>(),
-			align: align_of::<Bar<u32>>(),
+			size: Some(size_of::<Bar<u32>>()),
+			align: Some(align_of::<Bar<u32>>()),
 			fields: vec![DefStructField {
 				name: "inner".to_string(),
 				ser_name: "inner".to_string(),
@@ -176,8 +176,8 @@ fn struct_generic_one_type_param() {
 		bar_u8_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u8>".to_string(),
-			size: size_of::<Bar<u8>>(),
-			align: align_of::<Bar<u8>>(),
+			size: Some(size_of::<Bar<u8>>()),
+			align: Some(align_of::<Bar<u8>>()),
 			fields: vec![DefStructField {
 				name: "inner".to_string(),
 				ser_name: "inner".to_string(),
@@ -212,8 +212,8 @@ fn struct_generic_two_type_params() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![
 				DefStructField {
 					name: "big".to_string(),
@@ -239,8 +239,8 @@ fn struct_generic_two_type_params() {
 		bar_u64_u32_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u64,u32>".to_string(),
-			size: size_of::<Bar<u64, u32>>(),
-			align: align_of::<Bar<u64, u32>>(),
+			size: Some(size_of::<Bar<u64, u32>>()),
+			align: Some(align_of::<Bar<u64, u32>>()),
 			fields: vec![
 				DefStructField {
 					name: "one".to_string(),
@@ -269,8 +269,8 @@ fn struct_generic_two_type_params() {
 		bar_u16_u8_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u16,u8>".to_string(),
-			size: size_of::<Bar<u16, u8>>(),
-			align: align_of::<Bar<u16, u8>>(),
+			size: Some(size_of::<Bar<u16, u8>>()),
+			align: Some(align_of::<Bar<u16, u8>>()),
 			fields: vec![
 				DefStructField {
 					name: "one".to_string(),
@@ -309,8 +309,8 @@ fn struct_with_serde_field_rename() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
 				name: "num".to_string(),
 				ser_name: "bar".to_string(),
@@ -341,8 +341,8 @@ fn struct_with_serde_field_flatten() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
 				name: "bar".to_string(),
 				ser_name: "bar".to_string(),
@@ -373,8 +373,8 @@ fn struct_with_serde_field_rename_and_flatten() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
 				name: "bar".to_string(),
 				ser_name: "qux".to_string(),
@@ -400,8 +400,8 @@ fn struct_with_serde_field_default() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
-			size: size_of::<Foo>(),
-			align: align_of::<Foo>(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
 				name: "num".to_string(),
 				ser_name: "num".to_string(),

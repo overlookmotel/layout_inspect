@@ -41,6 +41,8 @@ pub fn types_to_json(types: &Vec<DefType>, pretty: bool) -> String {
 // `'static` bound required by `any::TypeId::of()`
 pub trait Inspectable: 'static {
 	fn name() -> String;
+	fn size() -> Option<usize>;
+	fn align() -> Option<usize>;
 	fn def(collector: &mut TypesCollector) -> DefType;
 }
 
