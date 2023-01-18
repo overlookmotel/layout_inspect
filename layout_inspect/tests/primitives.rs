@@ -115,6 +115,18 @@ fn bool() {
 }
 
 #[test]
+fn char() {
+	assert_eq!(
+		inspect::<char>()[0],
+		DefType::Primitive(DefPrimitive {
+			name: "char".to_string(),
+			size: size_of::<char>(),
+			align: align_of::<char>(),
+		})
+	);
+}
+
+#[test]
 fn unit() {
 	assert_eq!(
 		inspect::<()>()[0],
