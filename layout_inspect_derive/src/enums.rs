@@ -94,7 +94,7 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 
 	quote! {
 			#[automatically_derived]
-			impl Inspect for #ident {
+			impl Inspectable for #ident {
 					fn name() -> ::std::string::String {
 							stringify!(#ident).to_string()
 					}

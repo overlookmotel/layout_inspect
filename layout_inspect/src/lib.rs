@@ -2,8 +2,8 @@
 
 use std::{collections::hash_map::HashMap, fs, io, path::Path};
 
-pub use layout_inspect_derive::Inspect;
-// Used by `Inspect` derive macro
+pub use layout_inspect_derive::Inspectable;
+// Used by `Inspectable` derive macro
 #[doc(hidden)]
 pub use memoffset::offset_of as __offset_of;
 use serde_json;
@@ -15,7 +15,7 @@ use defs::DefType;
 
 pub type TypeId = u32;
 
-pub fn inspect<T: Inspect>() -> Vec<DefType> {
+pub fn inspect<T: Inspectable>() -> Vec<DefType> {
 	let mut collector = TypesCollector::new();
 	collector.collect::<T>();
 	collector.into_types()
@@ -39,7 +39,7 @@ pub fn types_to_json(types: &Vec<DefType>, pretty: bool) -> String {
 }
 
 // `'static` bound required by `any::TypeId::of()`
-pub trait Inspect: 'static {
+pub trait Inspectable: 'static {
 	fn name() -> String;
 	fn def(_collector: &mut TypesCollector) -> DefType;
 }
@@ -57,7 +57,7 @@ impl TypesCollector {
 		}
 	}
 
-	pub fn collect<T: Inspect>(&mut self) -> TypeId {
+	pub fn collect<T: Inspectable>(&mut self) -> TypeId {
 		let native_id = type_id_of::<T>();
 
 		if let Some(id) = self.native_type_id_to_id.get(&native_id) {

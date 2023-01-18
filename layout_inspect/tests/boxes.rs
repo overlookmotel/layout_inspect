@@ -2,7 +2,7 @@ use std::mem::{align_of, size_of};
 
 use layout_inspect::{
 	defs::{DefBox, DefType},
-	inspect, Inspect,
+	inspect, Inspectable,
 };
 
 #[test]
@@ -24,7 +24,7 @@ fn boxed_primitive() {
 
 #[test]
 fn boxed_struct() {
-	#[derive(Inspect)]
+	#[derive(Inspectable)]
 	struct Foo {
 		small: u8,
 		big: u128,

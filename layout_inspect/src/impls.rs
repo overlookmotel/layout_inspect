@@ -11,10 +11,10 @@ use crate::{
 		DefArc, DefBox, DefCell, DefMutex, DefOption, DefPhantomData, DefRc, DefRefCell, DefResult,
 		DefRwLock, DefString, DefType, DefVec,
 	},
-	Inspect, TypesCollector,
+	Inspectable, TypesCollector,
 };
 
-impl Inspect for String {
+impl Inspectable for String {
 	fn name() -> String {
 		"String".to_string()
 	}
@@ -30,7 +30,7 @@ impl Inspect for String {
 
 macro_rules! single_type_param {
 	($name:ident, $def:ident) => {
-		impl<T: Inspect> Inspect for $name<T> {
+		impl<T: Inspectable> Inspectable for $name<T> {
 			fn name() -> String {
 				stringify!($name).to_string() + "<" + &T::name() + ">"
 			}
@@ -60,7 +60,7 @@ single_type_param!(Arc, DefArc);
 
 macro_rules! double_type_param {
 	($name:ident, $def:ident, $field1:ident, $field2:ident) => {
-		impl<T: Inspect, T2: Inspect> Inspect for $name<T, T2> {
+		impl<T: Inspectable, T2: Inspectable> Inspectable for $name<T, T2> {
 			fn name() -> String {
 				stringify!($name).to_string() + "<" + &T::name() + "," + &T2::name() + ">"
 			}

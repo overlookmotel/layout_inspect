@@ -2,7 +2,7 @@ use std::mem::{align_of, size_of};
 
 use layout_inspect::{
 	defs::{DefOption, DefType},
-	inspect, Inspect,
+	inspect, Inspectable,
 };
 
 #[test]
@@ -41,7 +41,7 @@ fn option_primitive_with_niche() {
 
 #[test]
 fn option_struct() {
-	#[derive(Inspect)]
+	#[derive(Inspectable)]
 	struct Foo {
 		small: u8,
 		big: u32,
@@ -66,7 +66,7 @@ fn option_struct() {
 fn option_struct_with_niche() {
 	use std::num::NonZeroU32;
 
-	#[derive(Inspect)]
+	#[derive(Inspectable)]
 	struct Foo {
 		small: u8,
 		big: NonZeroU32,
