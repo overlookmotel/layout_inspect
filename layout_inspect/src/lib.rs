@@ -1,12 +1,11 @@
 #![cfg_attr(feature = "nightly", feature(core_intrinsics))]
 
-use std::{collections::hash_map::HashMap, fs, io, path::Path};
+use std::collections::hash_map::HashMap;
 
 pub use layout_inspect_derive::Inspectable;
 // Used by `Inspectable` derive macro
 #[doc(hidden)]
 pub use memoffset::offset_of as __offset_of;
-use serde_json;
 
 pub mod defs;
 mod impls;
@@ -19,23 +18,6 @@ pub fn inspect<T: Inspectable + ?Sized>() -> Vec<DefType> {
 	let mut collector = TypesCollector::new();
 	collector.collect::<T>();
 	collector.into_types()
-}
-
-pub fn write_types_to_json_file<P: AsRef<Path>>(
-	types: &Vec<DefType>,
-	path: P,
-	pretty: bool,
-) -> io::Result<()> {
-	let json = types_to_json(&types, pretty);
-	fs::write(path, json)
-}
-
-pub fn types_to_json(types: &Vec<DefType>, pretty: bool) -> String {
-	if pretty {
-		serde_json::to_string_pretty(types).unwrap()
-	} else {
-		serde_json::to_string(types).unwrap()
-	}
 }
 
 // `'static` bound required by `any::TypeId::of()`
