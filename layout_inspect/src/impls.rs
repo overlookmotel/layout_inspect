@@ -9,7 +9,7 @@ use std::{
 use crate::{
 	defs::{
 		DefArc, DefBox, DefCell, DefMutex, DefOption, DefPhantomData, DefRc, DefRefCell, DefResult,
-		DefRwLock, DefString, DefType, DefVec,
+		DefRwLock, DefStr, DefString, DefType, DefVec,
 	},
 	Inspectable, TypesCollector,
 };
@@ -31,6 +31,28 @@ impl Inspectable for String {
 		DefType::String(DefString {
 			name: Self::name(),
 			size: Self::size().unwrap(),
+			align: Self::align().unwrap(),
+		})
+	}
+}
+
+impl Inspectable for str {
+	fn name() -> String {
+		"str".to_string()
+	}
+
+	fn size() -> Option<usize> {
+		None
+	}
+
+	fn align() -> Option<usize> {
+		Some(align_of::<u8>())
+	}
+
+	fn def(_collector: &mut TypesCollector) -> DefType {
+		DefType::Str(DefStr {
+			name: Self::name(),
+			size: Self::size(),
 			align: Self::align().unwrap(),
 		})
 	}

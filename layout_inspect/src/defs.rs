@@ -10,6 +10,7 @@ pub enum DefType {
 	Struct(DefStruct),
 	Enum(DefEnum),
 	String(DefString),
+	Str(DefStr),
 	Box(DefBox),
 	Vec(DefVec),
 	Option(DefOption),
@@ -25,15 +26,16 @@ pub enum DefType {
 
 macro_rules! getter {
 	($field:ident, $rtn_type:ty, $out:expr) => {
-		getter!($field, $rtn_type, $out, $out);
+		getter!($field, $rtn_type, $out, $out, $out);
 	};
-	($field:ident, $rtn_type:ty, $out:expr, $unsized_out:expr) => {
+	($field:ident, $rtn_type:ty, $out:expr, $unsized_out:expr, $unsized_unaligned:expr) => {
 		pub fn $field(&self) -> $rtn_type {
 			match &self {
 				DefType::Primitive(DefPrimitive { $field, .. }) => $out,
-				DefType::Struct(DefStruct { $field, .. }) => $unsized_out,
+				DefType::Struct(DefStruct { $field, .. }) => $unsized_unaligned,
 				DefType::Enum(DefEnum { $field, .. }) => $out,
 				DefType::String(DefString { $field, .. }) => $out,
+				DefType::Str(DefStr { $field, .. }) => $unsized_out,
 				DefType::Box(DefBox { $field, .. }) => $out,
 				DefType::Vec(DefVec { $field, .. }) => $out,
 				DefType::Option(DefOption { $field, .. }) => $out,
@@ -71,9 +73,9 @@ macro_rules! to_methods {
 impl DefType {
 	getter!(name, &str, &name[..]);
 
-	getter!(size, Option<usize>, Some(*size), *size);
+	getter!(size, Option<usize>, Some(*size), *size, *size);
 
-	getter!(align, Option<usize>, Some(*align), *align);
+	getter!(align, Option<usize>, Some(*align), Some(*align), *align);
 
 	to_methods!(Primitive, DefPrimitive, into_primitive, to_primitive);
 
@@ -82,6 +84,8 @@ impl DefType {
 	to_methods!(Enum, DefEnum, into_enum, to_enum);
 
 	to_methods!(String, DefString, into_string, to_string);
+
+	to_methods!(Str, DefStr, into_str, to_str);
 
 	to_methods!(Box, DefBox, into_box, to_box);
 
@@ -201,5 +205,13 @@ double_type_param!(DefResult, ok_type_id, err_type_id);
 pub struct DefString {
 	pub name: String,
 	pub size: usize,
+	pub align: usize,
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Eq, Hash, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct DefStr {
+	pub name: String,
+	pub size: Option<usize>,
 	pub align: usize,
 }

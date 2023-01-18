@@ -1,7 +1,7 @@
 use std::mem::{align_of, size_of};
 
 use layout_inspect::{
-	defs::{DefPhantomData, DefResult, DefString, DefType},
+	defs::{DefPhantomData, DefResult, DefStr, DefString, DefType},
 	inspect,
 };
 
@@ -13,6 +13,18 @@ fn string() {
 			name: "String".to_string(),
 			size: size_of::<String>(),
 			align: align_of::<String>(),
+		})
+	);
+}
+
+#[test]
+fn str() {
+	assert_eq!(
+		inspect::<str>()[0],
+		DefType::Str(DefStr {
+			name: "str".to_string(),
+			size: None,
+			align: 1,
 		})
 	);
 }

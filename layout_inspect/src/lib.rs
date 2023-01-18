@@ -15,7 +15,7 @@ use defs::DefType;
 
 pub type TypeId = u32;
 
-pub fn inspect<T: Inspectable>() -> Vec<DefType> {
+pub fn inspect<T: Inspectable + ?Sized>() -> Vec<DefType> {
 	let mut collector = TypesCollector::new();
 	collector.collect::<T>();
 	collector.into_types()
@@ -59,7 +59,7 @@ impl TypesCollector {
 		}
 	}
 
-	pub fn collect<T: Inspectable>(&mut self) -> TypeId {
+	pub fn collect<T: Inspectable + ?Sized>(&mut self) -> TypeId {
 		let native_id = type_id_of::<T>();
 
 		if let Some(id) = self.native_type_id_to_id.get(&native_id) {
@@ -86,7 +86,7 @@ impl TypesCollector {
 }
 
 #[cfg(feature = "nightly")]
-fn type_id_of<T: 'static>() -> u64 {
+fn type_id_of<T: 'static + ?Sized>() -> u64 {
 	use std::intrinsics::type_id;
 	type_id::<T>()
 }
