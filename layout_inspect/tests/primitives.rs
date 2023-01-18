@@ -1,6 +1,6 @@
 use std::mem::{align_of, size_of};
 
-use struct_inspect::{
+use layout_inspect::{
 	defs::{DefPrimitive, DefType},
 	inspect,
 };

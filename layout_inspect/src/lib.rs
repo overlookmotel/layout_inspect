@@ -2,11 +2,11 @@
 
 use std::{collections::hash_map::HashMap, fs, io, path::Path};
 
+pub use layout_inspect_derive::Inspect;
 // Used by `Inspect` derive macro
 #[doc(hidden)]
 pub use memoffset::offset_of as __offset_of;
 use serde_json;
-pub use struct_inspect_derive::Inspect;
 
 pub mod defs;
 mod impls;

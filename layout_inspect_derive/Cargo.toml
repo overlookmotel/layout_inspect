@@ -1,5 +1,5 @@
 [package]
-name = "struct_inspect_derive"
+name = "layout_inspect_derive"
 version = "0.1.0"
 edition = "2021"
 

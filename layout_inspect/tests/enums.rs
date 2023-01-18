@@ -1,6 +1,6 @@
 use std::mem::{align_of, size_of, transmute};
 
-use struct_inspect::{
+use layout_inspect::{
 	defs::{DefEnum, DefEnumVariant, DefType},
 	inspect, Inspect,
 };

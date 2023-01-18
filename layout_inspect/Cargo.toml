@@ -1,12 +1,12 @@
 [package]
-name = "struct_inspect"
+name = "layout_inspect"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
 
 [dependencies]
-struct_inspect_derive = { path = "../struct_inspect_derive" }
+layout_inspect_derive = { path = "../layout_inspect_derive" }
 memoffset = { version = "0.6.5", features = ["unstable_const"] }
 regex = "1"
 serde = { version = "1.0", features = ["derive"] }

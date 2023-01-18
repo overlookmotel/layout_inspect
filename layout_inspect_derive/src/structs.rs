@@ -21,7 +21,7 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 		if let GenericParam::Type(ref mut type_param) = *param {
 			type_param
 				.bounds
-				.push(parse_quote!(::struct_inspect::Inspect));
+				.push(parse_quote!(::layout_inspect::Inspect));
 		}
 	}
 
@@ -32,7 +32,7 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 		.filter_map(|param| match param {
 			GenericParam::Type(param) => {
 				let ident = &param.ident;
-				Some(quote! {&<#ident as ::struct_inspect::Inspect>::name() +})
+				Some(quote! {&<#ident as ::layout_inspect::Inspect>::name() +})
 			}
 			_ => None,
 		})
@@ -54,14 +54,14 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 
 	quote! {
 			#[automatically_derived]
-			impl #impl_generics ::struct_inspect::Inspect for #ident #type_generics #where_clause {
+			impl #impl_generics ::layout_inspect::Inspect for #ident #type_generics #where_clause {
 					fn name() -> ::std::string::String {
 							stringify!(#ident).to_string() #sub_types_str
 					}
 
-					fn def(collector: &mut ::struct_inspect::TypesCollector) -> ::struct_inspect::defs::DefType {
-							::struct_inspect::defs::DefType::Struct(
-									::struct_inspect::defs::DefStruct {
+					fn def(collector: &mut ::layout_inspect::TypesCollector) -> ::layout_inspect::defs::DefType {
+							::layout_inspect::defs::DefType::Struct(
+									::layout_inspect::defs::DefStruct {
 											name: Self::name(),
 											size: ::std::mem::size_of::<Self>(),
 											align: ::std::mem::align_of::<Self>(),
@@ -126,11 +126,11 @@ fn get_named_field_def(field: &Field) -> TokenStream {
 	// Return field def
 	let ty = &field.ty;
 	quote! {
-			::struct_inspect::defs::DefStructField {
+			::layout_inspect::defs::DefStructField {
 					name: stringify!(#name).to_string(),
 					ser_name: #ser_name.to_string(),
 					type_id: collector.collect::<#ty>(),
-					offset: ::struct_inspect::__offset_of!(Self, #name),
+					offset: ::layout_inspect::__offset_of!(Self, #name),
 					flatten: #flatten,
 			}
 	}

@@ -82,7 +82,7 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 
 			let variant_ident = &variant.ident;
 			quote! {
-					::struct_inspect::defs::DefEnumVariant {
+					::layout_inspect::defs::DefEnumVariant {
 							name: stringify!(#variant_ident).to_string(),
 							discriminant: #discriminant,
 							ser_value: #ser_value,
@@ -99,9 +99,9 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 							stringify!(#ident).to_string()
 					}
 
-					fn def(collector: &mut ::struct_inspect::TypesCollector) -> ::struct_inspect::defs::DefType {
-							::struct_inspect::defs::DefType::Enum(
-									::struct_inspect::defs::DefEnum {
+					fn def(collector: &mut ::layout_inspect::TypesCollector) -> ::layout_inspect::defs::DefType {
+							::layout_inspect::defs::DefType::Enum(
+									::layout_inspect::defs::DefEnum {
 											name: Self::name(),
 											size: ::std::mem::size_of::<Self>(),
 											align: ::std::mem::align_of::<Self>(),

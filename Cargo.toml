@@ -1,5 +1,5 @@
 [workspace]
 members = [
-  "struct_inspect",
-  "struct_inspect_derive",
+  "layout_inspect",
+  "layout_inspect_derive",
 ]
