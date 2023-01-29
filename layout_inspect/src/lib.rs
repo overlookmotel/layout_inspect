@@ -2,8 +2,8 @@
 
 use std::collections::hash_map::HashMap;
 
-pub use layout_inspect_derive::Inspectable;
-// Used by `Inspectable` derive macro
+pub use layout_inspect_derive::Inspect;
+// Used by `Inspect` derive macro
 #[doc(hidden)]
 pub use memoffset::offset_of as __offset_of;
 
@@ -14,14 +14,14 @@ use defs::DefType;
 
 pub type TypeId = u32;
 
-pub fn inspect<T: Inspectable + ?Sized>() -> Vec<DefType> {
+pub fn inspect<T: Inspect + ?Sized>() -> Vec<DefType> {
 	let mut collector = TypesCollector::new();
 	collector.collect::<T>();
 	collector.into_types()
 }
 
 // `'static` bound required by `any::TypeId::of()`
-pub trait Inspectable: 'static {
+pub trait Inspect: 'static {
 	fn name() -> String;
 	fn size() -> Option<usize>;
 	fn align() -> Option<usize>;
@@ -41,7 +41,7 @@ impl TypesCollector {
 		}
 	}
 
-	pub fn collect<T: Inspectable + ?Sized>(&mut self) -> TypeId {
+	pub fn collect<T: Inspect + ?Sized>(&mut self) -> TypeId {
 		let native_id = type_id_of::<T>();
 
 		if let Some(id) = self.native_type_id_to_id.get(&native_id) {

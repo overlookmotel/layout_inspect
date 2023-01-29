@@ -8,12 +8,12 @@ use std::{
 
 use crate::{
 	defs::{DefPrimitive, DefType},
-	Inspectable, TypesCollector,
+	Inspect, TypesCollector,
 };
 
 macro_rules! primitive {
 	($type:ty) => {
-		impl Inspectable for $type {
+		impl Inspect for $type {
 			fn name() -> String {
 				stringify!($type).to_string()
 			}

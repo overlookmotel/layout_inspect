@@ -2,7 +2,7 @@ use std::mem::{align_of, size_of};
 
 use layout_inspect::{
 	defs::{DefType, DefVec},
-	inspect, Inspectable,
+	inspect, Inspect,
 };
 
 #[test]
@@ -24,7 +24,7 @@ fn vec_primitive() {
 
 #[test]
 fn vec_struct() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Foo {
 		small: u8,
 		big: u128,

@@ -16,12 +16,12 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 		Fields::Unit => todo!("Unit struct fields not supported"),
 	};
 
-	// Add bound `Inspectable` to type params
+	// Add bound `Inspect` to type params
 	for param in &mut generics.params {
 		if let GenericParam::Type(ref mut type_param) = *param {
 			type_param
 				.bounds
-				.push(parse_quote!(::layout_inspect::Inspectable));
+				.push(parse_quote!(::layout_inspect::Inspect));
 		}
 	}
 
@@ -32,7 +32,7 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 		.filter_map(|param| match param {
 			GenericParam::Type(param) => {
 				let ident = &param.ident;
-				Some(quote! {&<#ident as ::layout_inspect::Inspectable>::name() +})
+				Some(quote! {&<#ident as ::layout_inspect::Inspect>::name() +})
 			}
 			_ => None,
 		})
@@ -54,7 +54,7 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 
 	quote! {
 			#[automatically_derived]
-			impl #impl_generics ::layout_inspect::Inspectable for #ident #type_generics #where_clause {
+			impl #impl_generics ::layout_inspect::Inspect for #ident #type_generics #where_clause {
 					fn name() -> ::std::string::String {
 							stringify!(#ident).to_string() #sub_types_str
 					}

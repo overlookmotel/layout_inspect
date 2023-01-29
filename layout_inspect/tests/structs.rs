@@ -2,14 +2,14 @@ use std::mem::{align_of, size_of};
 
 use layout_inspect::{
 	defs::{DefStruct, DefStructField, DefType},
-	inspect, Inspectable,
+	inspect, Inspect,
 };
 
 // TODO Test for tuple struct - not implemented yet
 
 #[test]
 fn struct_single_field() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Foo {
 		num: u8,
 	}
@@ -38,7 +38,7 @@ fn struct_single_field() {
 
 #[test]
 fn struct_empty() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Foo {}
 
 	assert_eq!(
@@ -54,7 +54,7 @@ fn struct_empty() {
 
 #[test]
 fn struct_multiple_fields() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Foo {
 		small: u8,
 		medium: u16,
@@ -112,13 +112,13 @@ fn struct_multiple_fields() {
 
 #[test]
 fn struct_generic_one_type_param() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Foo {
 		big: Bar<u32>,
 		small: Bar<u8>,
 	}
 
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Bar<T> {
 		inner: T,
 	}
@@ -194,13 +194,13 @@ fn struct_generic_one_type_param() {
 
 #[test]
 fn struct_generic_two_type_params() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Foo {
 		big: Bar<u64, u32>,
 		small: Bar<u16, u8>,
 	}
 
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	struct Bar<T, U> {
 		one: T,
 		two: U,
@@ -299,7 +299,7 @@ fn struct_generic_two_type_params() {
 fn struct_with_serde_field_rename() {
 	use serde::{Deserialize, Serialize};
 
-	#[derive(Inspectable, Deserialize, Serialize)]
+	#[derive(Inspect, Deserialize, Serialize)]
 	struct Foo {
 		#[serde(rename = "bar")]
 		num: u8,
@@ -326,13 +326,13 @@ fn struct_with_serde_field_rename() {
 fn struct_with_serde_field_flatten() {
 	use serde::{Deserialize, Serialize};
 
-	#[derive(Inspectable, Deserialize, Serialize)]
+	#[derive(Inspect, Deserialize, Serialize)]
 	struct Foo {
 		#[serde(flatten)]
 		bar: Bar,
 	}
 
-	#[derive(Inspectable, Deserialize, Serialize)]
+	#[derive(Inspect, Deserialize, Serialize)]
 	struct Bar {
 		num: u8,
 	}
@@ -358,13 +358,13 @@ fn struct_with_serde_field_flatten() {
 fn struct_with_serde_field_rename_and_flatten() {
 	use serde::{Deserialize, Serialize};
 
-	#[derive(Inspectable, Deserialize, Serialize)]
+	#[derive(Inspect, Deserialize, Serialize)]
 	struct Foo {
 		#[serde(flatten, rename = "qux")]
 		bar: Bar,
 	}
 
-	#[derive(Inspectable, Deserialize, Serialize)]
+	#[derive(Inspect, Deserialize, Serialize)]
 	struct Bar {
 		num: u8,
 	}
@@ -390,7 +390,7 @@ fn struct_with_serde_field_rename_and_flatten() {
 fn struct_with_serde_field_default() {
 	use serde::{Deserialize, Serialize};
 
-	#[derive(Inspectable, Deserialize, Serialize)]
+	#[derive(Inspect, Deserialize, Serialize)]
 	struct Foo {
 		#[serde(default)]
 		num: u8,

@@ -2,12 +2,12 @@ use std::mem::{align_of, size_of, transmute};
 
 use layout_inspect::{
 	defs::{DefEnum, DefEnumVariant, DefType},
-	inspect, Inspectable,
+	inspect, Inspect,
 };
 
 #[test]
 fn enum_fieldless() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	#[allow(dead_code)]
 	enum Foo {
 		/// `o1`
@@ -49,7 +49,7 @@ fn enum_fieldless() {
 
 #[test]
 fn enum_fieldless_with_discriminants() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	#[allow(dead_code)]
 	enum Foo {
 		/// `o1`
@@ -109,7 +109,7 @@ fn enum_fieldless_with_discriminants() {
 
 #[test]
 fn enum_fieldful() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	#[allow(dead_code)]
 	enum Foo {
 		Opt1(u8),
@@ -148,7 +148,7 @@ fn enum_fieldful() {
 
 #[test]
 fn enum_mixed_fieldless_and_fieldful() {
-	#[derive(Inspectable)]
+	#[derive(Inspect)]
 	#[allow(dead_code)]
 	enum Foo {
 		/// `o1`
