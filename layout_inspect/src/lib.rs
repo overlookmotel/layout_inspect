@@ -2,8 +2,10 @@
 
 use std::collections::hash_map::HashMap;
 
+#[cfg(feature = "derive")]
 pub use layout_inspect_derive::Inspect;
 // Used by `Inspect` derive macro
+#[cfg(feature = "derive")]
 #[doc(hidden)]
 pub use memoffset::offset_of as __offset_of;
 
