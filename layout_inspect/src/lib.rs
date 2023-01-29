@@ -67,13 +67,19 @@ impl TypesCollector {
 	}
 }
 
+#[cfg(all(feature = "stable", feature = "nightly"))]
+compile_error!("stable and nightly features cannot both be enabled");
+
+#[cfg(not(any(feature = "stable", feature = "nightly")))]
+compile_error!("either stable or nightly feature must be enabled");
+
 #[cfg(feature = "nightly")]
 fn type_id_of<T: 'static + ?Sized>() -> u64 {
 	use std::intrinsics::type_id;
 	type_id::<T>()
 }
 
-#[cfg(not(feature = "nightly"))]
+#[cfg(all(feature = "stable", not(feature = "nightly")))]
 fn type_id_of<T: 'static + ?Sized>() -> u64 {
 	// Hacky way to get Rust's native type ID without nightly.
 	// `std::any::TypeId` does not expose any direct way to get the actual u64 ID.
