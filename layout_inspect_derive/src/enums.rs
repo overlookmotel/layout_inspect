@@ -57,18 +57,16 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 					let regex = Regex::new("^ `(.+)`$").unwrap();
 					let ser_value = &regex.captures(&ser_value).unwrap()[1];
 
-					let ser_value = quote! { ::std::option::Option::Some(#ser_value.to_string()) };
-					let value_type_id = quote! { ::std::option::Option::None };
+					let ser_value = quote! { Some(#ser_value.to_string()) };
+					let value_type_id = quote! { None };
 					(ser_value, value_type_id)
 				}
 				Fields::Unnamed(ref fields) => {
 					let unnamed = &fields.unnamed;
 					assert!(unnamed.len() == 1);
 					let ty = &unnamed.first().unwrap().ty;
-					let ser_value = quote! { ::std::option::Option::None };
-					let value_type_id = quote! {
-						::std::option::Option::Some(collector.collect::<#ty>())
-					};
+					let ser_value = quote! { None };
+					let value_type_id = quote! { Some(collector.collect::<#ty>()) };
 					(ser_value, value_type_id)
 				}
 				Fields::Named(_) => todo!(),
@@ -92,7 +90,7 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 
 			let variant_ident = &variant.ident;
 			quote! {
-				::layout_inspect::defs::DefEnumVariant {
+				DefEnumVariant {
 					name: stringify!(#variant_ident).to_string(),
 					discriminant: #discriminant,
 					ser_value: #ser_value,
@@ -103,30 +101,41 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 		.collect();
 
 	quote! {
-		#[automatically_derived]
-		impl Inspect for #ident {
-			fn name() -> ::std::string::String {
-				stringify!(#ident).to_string()
-			}
+		const _: () = {
+			use ::std::{
+				mem,
+				option::Option::{self, None, Some},
+				string::String,
+				stringify, vec,
+			};
+			use ::layout_inspect::{
+				defs::{DefEnum, DefEnumVariant, DefType},
+				Inspect, TypesCollector,
+			};
 
-			fn size() -> Option<usize> {
-				Some(::std::mem::size_of::<Self>())
-			}
+			#[automatically_derived]
+			impl Inspect for #ident {
+				fn name() -> String {
+					stringify!(#ident).to_string()
+				}
 
-			fn align() -> Option<usize> {
-				Some(::std::mem::align_of::<Self>())
-			}
+				fn size() -> Option<usize> {
+					Some(mem::size_of::<Self>())
+				}
 
-			fn def(collector: &mut ::layout_inspect::TypesCollector) -> ::layout_inspect::defs::DefType {
-				::layout_inspect::defs::DefType::Enum(
-					::layout_inspect::defs::DefEnum {
+				fn align() -> Option<usize> {
+					Some(mem::align_of::<Self>())
+				}
+
+				fn def(collector: &mut TypesCollector) -> DefType {
+					DefType::Enum(DefEnum {
 						name: Self::name(),
 						size: Self::size().unwrap(),
 						align: Self::align().unwrap(),
-						variants: ::std::vec![#(#variant_defs),*],
-					}
-				)
+						variants: vec![#(#variant_defs),*],
+					})
+				}
 			}
-		}
+		};
 	}
 }
