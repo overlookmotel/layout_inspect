@@ -5,7 +5,7 @@ use layout_inspect::{
 	inspect, Inspect,
 };
 
-// TODO Test for tuple struct - not implemented yet
+// TODO: Test for tuple struct - not implemented yet
 
 #[test]
 fn struct_single_field() {

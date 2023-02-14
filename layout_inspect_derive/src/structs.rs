@@ -5,7 +5,7 @@ use syn::{
 	Lit, Meta, NestedMeta,
 };
 
-// TODO Support `#[serde(rename_all = "camelCase")]` (and other variants)
+// TODO: Support `#[serde(rename_all = "camelCase")]` (and other variants)
 // https://serde.rs/container-attrs.html#rename_all
 
 pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) -> TokenStream {
@@ -61,8 +61,8 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 				stringify!(#ident).to_string() #sub_types_str
 			}
 
-			// TODO Allow deriving for unsized types
-			// TODO Deduce alignment for unsized types where possible e.g. `struct X { n: u64, s: str }`
+			// TODO: Allow deriving for unsized types
+			// TODO: Deduce alignment for unsized types where possible e.g. `struct X { n: u64, s: str }`
 			fn size() -> Option<usize> {
 				Some(::std::mem::size_of::<Self>())
 			}

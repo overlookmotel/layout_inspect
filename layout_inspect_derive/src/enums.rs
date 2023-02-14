@@ -3,9 +3,9 @@ use quote::quote;
 use regex::Regex;
 use syn::{AttrStyle, DataEnum, Expr, Fields, Ident, Lit, Meta};
 
-// TODO Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
-// TODO Support fieldless enums with no value annotation - use discriminant
-// TODO Support `#[serde(rename_all = "camelCase")]` (and other cases)
+// TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
+// TODO: Support fieldless enums with no value annotation - use discriminant
+// TODO: Support `#[serde(rename_all = "camelCase")]` (and other cases)
 // https://serde.rs/container-attrs.html#rename_all
 
 pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
