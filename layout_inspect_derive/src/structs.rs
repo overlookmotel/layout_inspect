@@ -55,33 +55,33 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 	let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
 
 	quote! {
-			#[automatically_derived]
-			impl #impl_generics ::layout_inspect::Inspect for #ident #type_generics #where_clause {
-					fn name() -> ::std::string::String {
-							stringify!(#ident).to_string() #sub_types_str
-					}
-
-					// TODO Allow deriving for unsized types
-					// TODO Deduce alignment for unsized types where possible e.g. `struct X { n: u64, s: str }`
-					fn size() -> Option<usize> {
-						Some(::std::mem::size_of::<Self>())
-					}
-
-					fn align() -> Option<usize> {
-						Some(::std::mem::align_of::<Self>())
-					}
-
-					fn def(collector: &mut ::layout_inspect::TypesCollector) -> ::layout_inspect::defs::DefType {
-							::layout_inspect::defs::DefType::Struct(
-									::layout_inspect::defs::DefStruct {
-											name: Self::name(),
-											size: Self::size(),
-											align: Self::align(),
-											fields: vec![#(#field_defs),*],
-									}
-							)
-					}
+		#[automatically_derived]
+		impl #impl_generics ::layout_inspect::Inspect for #ident #type_generics #where_clause {
+			fn name() -> ::std::string::String {
+				stringify!(#ident).to_string() #sub_types_str
 			}
+
+			// TODO Allow deriving for unsized types
+			// TODO Deduce alignment for unsized types where possible e.g. `struct X { n: u64, s: str }`
+			fn size() -> Option<usize> {
+				Some(::std::mem::size_of::<Self>())
+			}
+
+			fn align() -> Option<usize> {
+				Some(::std::mem::align_of::<Self>())
+			}
+
+			fn def(collector: &mut ::layout_inspect::TypesCollector) -> ::layout_inspect::defs::DefType {
+				::layout_inspect::defs::DefType::Struct(
+					::layout_inspect::defs::DefStruct {
+						name: Self::name(),
+						size: Self::size(),
+						align: Self::align(),
+						fields: vec![#(#field_defs),*],
+					}
+				)
+			}
+		}
 	}
 }
 
@@ -138,12 +138,12 @@ fn get_named_field_def(field: &Field) -> TokenStream {
 	// Return field def
 	let ty = &field.ty;
 	quote! {
-			::layout_inspect::defs::DefStructField {
-					name: stringify!(#name).to_string(),
-					ser_name: #ser_name.to_string(),
-					type_id: collector.collect::<#ty>(),
-					offset: ::layout_inspect::__offset_of!(Self, #name),
-					flatten: #flatten,
-			}
+		::layout_inspect::defs::DefStructField {
+			name: stringify!(#name).to_string(),
+			ser_name: #ser_name.to_string(),
+			type_id: collector.collect::<#ty>(),
+			offset: ::layout_inspect::__offset_of!(Self, #name),
+			flatten: #flatten,
+		}
 	}
 }
