@@ -35,17 +35,23 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 
 					let meta = doc_comments[0].parse_meta().unwrap();
 					let ser_value = match meta {
-						Meta::NameValue(name_value) => match &name_value.lit {
-							Lit::Str(s) => s.value(),
-							_ => panic!(
+						Meta::NameValue(name_value) => {
+							match &name_value.lit {
+								Lit::Str(s) => s.value(),
+								_ => {
+									panic!(
+										"Unexpected value doc comment for {} enum {} option",
+										ident, variant.ident
+									)
+								}
+							}
+						}
+						_ => {
+							panic!(
 								"Unexpected value doc comment for {} enum {} option",
 								ident, variant.ident
-							),
-						},
-						_ => panic!(
-							"Unexpected value doc comment for {} enum {} option",
-							ident, variant.ident
-						),
+							)
+						}
 					};
 
 					let regex = Regex::new("^ `(.+)`$").unwrap();
@@ -69,13 +75,17 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 			};
 
 			let discriminant = match &variant.discriminant {
-				Some(discriminant) => match &discriminant.1 {
-					Expr::Lit(expr_lit) => match &expr_lit.lit {
-						Lit::Int(int) => int.base10_parse::<u64>().unwrap(),
+				Some(discriminant) => {
+					match &discriminant.1 {
+						Expr::Lit(expr_lit) => {
+							match &expr_lit.lit {
+								Lit::Int(int) => int.base10_parse::<u64>().unwrap(),
+								_ => todo!(),
+							}
+						}
 						_ => todo!(),
-					},
-					_ => todo!(),
-				},
+					}
+				}
 				None => next_discriminant,
 			};
 			next_discriminant = discriminant + 1;

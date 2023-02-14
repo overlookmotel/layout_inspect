@@ -29,12 +29,14 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 	let sub_types: Vec<TokenStream> = generics
 		.params
 		.iter()
-		.filter_map(|param| match param {
-			GenericParam::Type(param) => {
-				let ident = &param.ident;
-				Some(quote! {&<#ident as ::layout_inspect::Inspect>::name() +})
+		.filter_map(|param| {
+			match param {
+				GenericParam::Type(param) => {
+					let ident = &param.ident;
+					Some(quote! {&<#ident as ::layout_inspect::Inspect>::name() +})
+				}
+				_ => None,
 			}
-			_ => None,
 		})
 		.collect();
 
