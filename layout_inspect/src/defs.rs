@@ -1,3 +1,5 @@
+use macro_rules_attribute::apply;
+
 use super::TypeId;
 
 #[derive(PartialEq, Eq, Hash, Debug)]
@@ -116,24 +118,26 @@ impl DefType {
 	to_methods!(Result, DefResult, into_result, to_result);
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(
-	feature = "serde",
-	derive(serde::Serialize, serde::Deserialize),
-	serde(rename_all = "camelCase")
-)]
+macro_rules! def {
+	($def:item) => {
+		#[derive(PartialEq, Eq, Hash, Debug)]
+		#[cfg_attr(
+			feature = "serde",
+			derive(serde::Serialize, serde::Deserialize),
+			serde(rename_all = "camelCase")
+		)]
+		$def
+	};
+}
+
+#[apply(def)]
 pub struct DefPrimitive {
 	pub name: String,
 	pub size: usize,
 	pub align: usize,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(
-	feature = "serde",
-	derive(serde::Serialize, serde::Deserialize),
-	serde(rename_all = "camelCase")
-)]
+#[apply(def)]
 pub struct DefStruct {
 	pub name: String,
 	pub size: Option<usize>,
@@ -141,12 +145,7 @@ pub struct DefStruct {
 	pub fields: Vec<DefStructField>,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(
-	feature = "serde",
-	derive(serde::Serialize, serde::Deserialize),
-	serde(rename_all = "camelCase")
-)]
+#[apply(def)]
 pub struct DefStructField {
 	pub name: String,
 	pub ser_name: String,
@@ -155,12 +154,7 @@ pub struct DefStructField {
 	pub flatten: bool,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(
-	feature = "serde",
-	derive(serde::Serialize, serde::Deserialize),
-	serde(rename_all = "camelCase")
-)]
+#[apply(def)]
 pub struct DefEnum {
 	pub name: String,
 	pub size: usize,
@@ -168,12 +162,7 @@ pub struct DefEnum {
 	pub variants: Vec<DefEnumVariant>,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(
-	feature = "serde",
-	derive(serde::Serialize, serde::Deserialize),
-	serde(rename_all = "camelCase")
-)]
+#[apply(def)]
 pub struct DefEnumVariant {
 	pub name: String,
 	pub discriminant: u64,
@@ -184,12 +173,7 @@ pub struct DefEnumVariant {
 
 macro_rules! single_type_param {
 	($def:ident) => {
-		#[derive(PartialEq, Eq, Hash, Debug)]
-		#[cfg_attr(
-			feature = "serde",
-			derive(serde::Serialize, serde::Deserialize),
-			serde(rename_all = "camelCase")
-		)]
+		#[apply(def)]
 		pub struct $def {
 			pub name: String,
 			pub size: usize,
@@ -212,12 +196,7 @@ single_type_param!(DefArc);
 
 macro_rules! double_type_param {
 	($def:ident, $field1:ident, $field2:ident) => {
-		#[derive(PartialEq, Eq, Hash, Debug)]
-		#[cfg_attr(
-			feature = "serde",
-			derive(serde::Serialize, serde::Deserialize),
-			serde(rename_all = "camelCase")
-		)]
+		#[apply(def)]
 		pub struct $def {
 			pub name: String,
 			pub size: usize,
@@ -230,24 +209,14 @@ macro_rules! double_type_param {
 
 double_type_param!(DefResult, ok_type_id, err_type_id);
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(
-	feature = "serde",
-	derive(serde::Serialize, serde::Deserialize),
-	serde(rename_all = "camelCase")
-)]
+#[apply(def)]
 pub struct DefString {
 	pub name: String,
 	pub size: usize,
 	pub align: usize,
 }
 
-#[derive(PartialEq, Eq, Hash, Debug)]
-#[cfg_attr(
-	feature = "serde",
-	derive(serde::Serialize, serde::Deserialize),
-	serde(rename_all = "camelCase")
-)]
+#[apply(def)]
 pub struct DefStr {
 	pub name: String,
 	pub size: Option<usize>,
