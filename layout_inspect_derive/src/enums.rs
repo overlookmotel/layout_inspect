@@ -11,7 +11,11 @@ use syn::{AttrStyle, DataEnum, Expr, Fields, Ident, Lit, Meta};
 // TODO: For fieldless enums, use e.g. `Foo::Bar as u64` to get discriminants.
 // Discrimants can be defined as a const expression which we can't parse
 // e.g. `enum X { Y = mem::size_of::<u32>() }`
-// NB Only legal for enums where all variants are legal.
+// NB Only legal for enums where all variants are fieldless.
+// That includes e.g. `enum X { Tuple(), Struct{} }`.
+// Also see: https://rust-lang.github.io/rfcs/2363-arbitrary-enum-discriminant.html
+// Maybe possible to obtain discriminant values for field-ful enums
+// if enum is `#[repr(u../i..)]`.
 
 pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
