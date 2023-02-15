@@ -7,6 +7,11 @@ use syn::{AttrStyle, DataEnum, Expr, Fields, Ident, Lit, Meta};
 // TODO: Support fieldless enums with no value annotation - use discriminant
 // TODO: Support `#[serde(rename_all = "camelCase")]` (and other cases)
 // https://serde.rs/container-attrs.html#rename_all
+// TODO: Should `discriminant` be `i64` not `u64`?
+// TODO: For fieldless enums, use e.g. `Foo::Bar as u64` to get discriminants.
+// Discrimants can be defined as a const expression which we can't parse
+// e.g. `enum X { Y = mem::size_of::<u32>() }`
+// NB Only legal for enums where all variants are legal.
 
 pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 	let mut next_discriminant: u64 = 0;

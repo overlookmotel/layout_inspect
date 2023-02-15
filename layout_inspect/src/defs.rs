@@ -177,6 +177,7 @@ pub struct DefEnum {
 pub struct DefEnumVariant {
 	pub name: String,
 	pub discriminant: u64,
+	// TODO: Need `offset` here or `discriminant_size` in `DefEnum`
 	pub ser_value: Option<String>,
 	pub value_type_id: Option<TypeId>,
 }
