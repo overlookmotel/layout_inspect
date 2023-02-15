@@ -63,23 +63,13 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 			use ::layout_inspect::{
 				__offset_of as offset_of,
 				defs::{DefStruct, DefStructField, DefType},
-				Inspect, TypesCollector,
+				Inspect, InspectSize, TypesCollector,
 			};
 
 			#[automatically_derived]
 			impl #impl_generics Inspect for #ident #type_generics #where_clause {
 				fn name() -> String {
 					stringify!(#ident).to_string() #sub_types_str
-				}
-
-				// TODO: Allow deriving for unsized types
-				// TODO: Deduce alignment for unsized types where possible e.g. `struct X { n: u64, s: str }`
-				fn size() -> Option<usize> {
-					Some(mem::size_of::<Self>())
-				}
-
-				fn align() -> Option<usize> {
-					Some(mem::align_of::<Self>())
 				}
 
 				fn def(collector: &mut TypesCollector) -> DefType {

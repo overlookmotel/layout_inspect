@@ -1,6 +1,6 @@
 #![cfg_attr(feature = "nightly", feature(core_intrinsics))]
 
-use std::collections::hash_map::HashMap;
+use std::{collections::hash_map::HashMap, mem};
 
 #[cfg(feature = "derive")]
 pub use layout_inspect_derive::Inspect;
@@ -22,11 +22,26 @@ pub fn inspect<T: Inspect + ?Sized>() -> Vec<DefType> {
 	collector.into_types()
 }
 
-// `'static` bound required by `any::TypeId::of()`
-pub trait Inspect: 'static {
-	fn name() -> String;
-	fn size() -> Option<usize>;
+pub trait InspectSize {
+	fn size() -> Option<usize> {
+		None
+	}
 	fn align() -> Option<usize>;
+}
+
+impl<T: Sized> InspectSize for T {
+	fn size() -> Option<usize> {
+		Some(mem::size_of::<Self>())
+	}
+
+	fn align() -> Option<usize> {
+		Some(mem::align_of::<Self>())
+	}
+}
+
+// `'static` bound required by `any::TypeId::of()`
+pub trait Inspect: InspectSize + 'static {
+	fn name() -> String;
 	fn def(collector: &mut TypesCollector) -> DefType;
 }
 

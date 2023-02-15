@@ -1,7 +1,7 @@
 use std::{
 	cell::{Cell, RefCell},
 	marker::PhantomData,
-	mem::{align_of, size_of},
+	mem,
 	rc::Rc,
 	sync::{Arc, Mutex, RwLock},
 };
@@ -11,20 +11,12 @@ use crate::{
 		DefArc, DefBox, DefCell, DefMutex, DefOption, DefPhantomData, DefRc, DefRefCell, DefResult,
 		DefRwLock, DefStr, DefString, DefType, DefVec,
 	},
-	Inspect, TypesCollector,
+	Inspect, InspectSize, TypesCollector,
 };
 
 impl Inspect for String {
 	fn name() -> String {
 		"String".to_string()
-	}
-
-	fn size() -> Option<usize> {
-		Some(size_of::<Self>())
-	}
-
-	fn align() -> Option<usize> {
-		Some(align_of::<Self>())
 	}
 
 	fn def(_collector: &mut TypesCollector) -> DefType {
@@ -36,17 +28,19 @@ impl Inspect for String {
 	}
 }
 
-impl Inspect for str {
-	fn name() -> String {
-		"str".to_string()
-	}
-
+impl InspectSize for str {
 	fn size() -> Option<usize> {
 		None
 	}
 
 	fn align() -> Option<usize> {
-		Some(align_of::<u8>())
+		Some(mem::align_of::<u8>())
+	}
+}
+
+impl Inspect for str {
+	fn name() -> String {
+		"str".to_string()
 	}
 
 	fn def(_collector: &mut TypesCollector) -> DefType {
@@ -63,14 +57,6 @@ macro_rules! single_type_param {
 		impl<T: Inspect> Inspect for $name<T> {
 			fn name() -> String {
 				stringify!($name).to_string() + "<" + &T::name() + ">"
-			}
-
-			fn size() -> Option<usize> {
-				Some(size_of::<Self>())
-			}
-
-			fn align() -> Option<usize> {
-				Some(align_of::<Self>())
 			}
 
 			fn def(collector: &mut TypesCollector) -> DefType {
@@ -101,14 +87,6 @@ macro_rules! double_type_param {
 		impl<T: Inspect, T2: Inspect> Inspect for $name<T, T2> {
 			fn name() -> String {
 				stringify!($name).to_string() + "<" + &T::name() + "," + &T2::name() + ">"
-			}
-
-			fn size() -> Option<usize> {
-				Some(size_of::<Self>())
-			}
-
-			fn align() -> Option<usize> {
-				Some(align_of::<Self>())
 			}
 
 			fn def(collector: &mut TypesCollector) -> DefType {

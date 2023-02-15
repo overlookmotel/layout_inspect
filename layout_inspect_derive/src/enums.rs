@@ -110,21 +110,13 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 			};
 			use ::layout_inspect::{
 				defs::{DefEnum, DefEnumVariant, DefType},
-				Inspect, TypesCollector,
+				Inspect, InspectSize, TypesCollector,
 			};
 
 			#[automatically_derived]
 			impl Inspect for #ident {
 				fn name() -> String {
 					stringify!(#ident).to_string()
-				}
-
-				fn size() -> Option<usize> {
-					Some(mem::size_of::<Self>())
-				}
-
-				fn align() -> Option<usize> {
-					Some(mem::align_of::<Self>())
 				}
 
 				fn def(collector: &mut TypesCollector) -> DefType {

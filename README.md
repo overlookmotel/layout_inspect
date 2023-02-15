@@ -42,6 +42,28 @@ All types used within a struct/enum which derives `Inspect` must themselves impl
 
 Tuples, arrays, tuple structs, and references (`&T`) are not supported yet.
 
+### `InspectSize` trait
+
+For types which are not `Sized`, `InspectSize` trait must also be implemented.
+
+There is no derive macro for `InspectSize` at present, so it needs to be manually implemented.
+
+```rust
+use layout_inspect::{Inspect, InspectSize};
+
+#[derive(Inspect)]
+struct Foo {
+  number: u32,
+  maybe: [u8],
+}
+
+impl InspectSize for Foo {
+  fn align() -> Option<usize> {
+    Some(std::mem::align_of::<u32>())
+  }
+}
+```
+
 ### Inspecting
 
 ```rust

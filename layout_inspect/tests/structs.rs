@@ -413,6 +413,37 @@ fn struct_with_serde_field_default() {
 	);
 }
 
+#[test]
+fn struct_unsized() {
+	use layout_inspect::InspectSize;
+	#[derive(Inspect)]
+	struct Foo {
+		str: str,
+	}
+
+	impl InspectSize for Foo {
+		fn align() -> Option<usize> {
+			Some(align_of::<u8>())
+		}
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Struct(DefStruct {
+			name: "Foo<u8>".to_string(),
+			size: Some(size_of::<u8>()),
+			align: Some(align_of::<u8>()),
+			fields: vec![DefStructField {
+				name: "str".to_string(),
+				ser_name: "str".to_string(),
+				type_id: 1,
+				offset: 0,
+				flatten: false,
+			}]
+		})
+	);
+}
+
 fn get_field_ids(struct_def: &DefType) -> Vec<usize> {
 	struct_def
 		.to_struct()

@@ -1,14 +1,11 @@
-use std::{
-	mem::{align_of, size_of},
-	num::{
-		NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
-		NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize,
-	},
+use std::num::{
+	NonZeroI128, NonZeroI16, NonZeroI32, NonZeroI64, NonZeroI8, NonZeroIsize, NonZeroU128,
+	NonZeroU16, NonZeroU32, NonZeroU64, NonZeroU8, NonZeroUsize,
 };
 
 use crate::{
 	defs::{DefPrimitive, DefType},
-	Inspect, TypesCollector,
+	Inspect, InspectSize, TypesCollector,
 };
 
 macro_rules! primitive {
@@ -16,14 +13,6 @@ macro_rules! primitive {
 		impl Inspect for $type {
 			fn name() -> String {
 				stringify!($type).to_string()
-			}
-
-			fn size() -> Option<usize> {
-				Some(size_of::<Self>())
-			}
-
-			fn align() -> Option<usize> {
-				Some(align_of::<Self>())
 			}
 
 			fn def(_collector: &mut TypesCollector) -> DefType {
