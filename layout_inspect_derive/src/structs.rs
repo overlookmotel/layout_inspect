@@ -8,11 +8,11 @@ use syn::{
 // TODO: Support `#[serde(rename_all = "camelCase")]` (and other variants)
 // https://serde.rs/container-attrs.html#rename_all
 
-pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) -> TokenStream {
+pub fn derive_struct(data: DataStruct, ident: Ident, mut generics: Generics) -> TokenStream {
 	// Get field definitions
 	let field_defs: Vec<TokenStream> = match data.fields {
-		Fields::Named(ref fields) => get_named_field_defs(fields),
-		Fields::Unnamed(ref _fields) => todo!("Unnamed struct fields not supported"),
+		Fields::Named(fields) => get_named_field_defs(fields),
+		Fields::Unnamed(_fields) => todo!("Unnamed struct fields not supported"),
 		Fields::Unit => todo!("Unit struct fields not supported"),
 	};
 
@@ -95,7 +95,7 @@ pub fn derive_struct(data: &DataStruct, ident: Ident, mut generics: Generics) ->
 	}
 }
 
-fn get_named_field_defs(fields: &FieldsNamed) -> Vec<TokenStream> {
+fn get_named_field_defs(fields: FieldsNamed) -> Vec<TokenStream> {
 	fields
 		.named
 		.iter()

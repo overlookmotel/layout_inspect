@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use regex::Regex;
-use syn::{AttrStyle, DataEnum, Expr, Fields, Ident, Lit, Meta};
+use syn::{AttrStyle, DataEnum, Expr, Fields, FieldsUnnamed, Ident, Lit, Meta};
 
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
 // TODO: Support fieldless enums with no value annotation - use discriminant
@@ -17,18 +17,18 @@ use syn::{AttrStyle, DataEnum, Expr, Fields, Ident, Lit, Meta};
 // Maybe possible to obtain discriminant values for field-ful enums
 // if enum is `#[repr(u../i..)]`.
 
-pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
+pub fn derive_enum(data: DataEnum, ident: Ident) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
 
 	let variant_defs: Vec<_> = data
 		.variants
-		.iter()
+		.into_iter()
 		.map(|variant| {
-			let (ser_value, value_type_id) = match &variant.fields {
+			let (ser_value, value_type_id) = match variant.fields {
 				Fields::Unit => {
 					let doc_comments: Vec<_> = variant
 						.attrs
-						.iter()
+						.into_iter()
 						.filter(|attr| attr.style == AttrStyle::Outer && attr.path.is_ident("doc"))
 						.collect();
 					assert!(
@@ -45,7 +45,7 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 					let meta = doc_comments[0].parse_meta().unwrap();
 					let ser_value = match meta {
 						Meta::NameValue(name_value) => {
-							match &name_value.lit {
+							match name_value.lit {
 								Lit::Str(s) => s.value(),
 								_ => {
 									panic!(
@@ -70,8 +70,7 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 					let value_type_id = quote! { None };
 					(ser_value, value_type_id)
 				}
-				Fields::Unnamed(ref fields) => {
-					let unnamed = &fields.unnamed;
+				Fields::Unnamed(FieldsUnnamed { unnamed, .. }) => {
 					assert!(unnamed.len() == 1);
 					let ty = &unnamed.first().unwrap().ty;
 					let ser_value = quote! { None };
@@ -81,11 +80,11 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 				Fields::Named(_) => todo!(),
 			};
 
-			let discriminant = match &variant.discriminant {
+			let discriminant = match variant.discriminant {
 				Some(discriminant) => {
-					match &discriminant.1 {
+					match discriminant.1 {
 						Expr::Lit(expr_lit) => {
-							match &expr_lit.lit {
+							match expr_lit.lit {
 								Lit::Int(int) => int.base10_parse::<u64>().unwrap(),
 								_ => todo!(),
 							}
@@ -97,7 +96,7 @@ pub fn derive_enum(data: &DataEnum, ident: Ident) -> TokenStream {
 			};
 			next_discriminant = discriminant + 1;
 
-			let variant_ident = &variant.ident;
+			let variant_ident = variant.ident;
 			quote! {
 				DefEnumVariant {
 					name: stringify!(#variant_ident).to_string(),
