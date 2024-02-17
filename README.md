@@ -104,7 +104,7 @@ serde_json = "1.0"
 
 ```rust
 let types = inspect::<Foo>();
-let json = serde_json::to_string(types).unwrap();
+let json = serde_json::to_string(&types).unwrap();
 ```
 
 ```json
