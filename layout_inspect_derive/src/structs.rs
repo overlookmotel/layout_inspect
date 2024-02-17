@@ -31,7 +31,7 @@ pub fn derive_struct(data: DataStruct, ident: Ident, mut generics: Generics) -> 
 			match param {
 				GenericParam::Type(param) => {
 					let ident = &param.ident;
-					Some(quote! {&#ident::name() +})
+					Some(quote! {&<#ident as Inspect>::name() +})
 				}
 				_ => None,
 			}
@@ -84,9 +84,9 @@ pub fn derive_struct(data: DataStruct, ident: Ident, mut generics: Generics) -> 
 
 				fn def(collector: &mut TypesCollector) -> DefType {
 					DefType::Struct(DefStruct {
-						name: Self::name(),
-						size: Self::size(),
-						align: Self::align(),
+						name: <Self as Inspect>::name(),
+						size: <Self as Inspect>::size(),
+						align: <Self as Inspect>::align(),
 						fields: vec![#(#field_defs),*],
 					})
 				}

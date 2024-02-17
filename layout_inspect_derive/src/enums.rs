@@ -137,9 +137,9 @@ pub fn derive_enum(data: DataEnum, ident: Ident) -> TokenStream {
 
 				fn def(collector: &mut TypesCollector) -> DefType {
 					DefType::Enum(DefEnum {
-						name: Self::name(),
-						size: Self::size().unwrap(),
-						align: Self::align().unwrap(),
+						name: <Self as Inspect>::name(),
+						size: <Self as Inspect>::size().unwrap(),
+						align: <Self as Inspect>::align().unwrap(),
 						variants: vec![#(#variant_defs),*],
 					})
 				}
