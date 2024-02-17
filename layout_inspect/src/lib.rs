@@ -32,7 +32,7 @@ pub trait Inspect: 'static {
 
 pub struct TypesCollector {
 	types: Vec<Option<DefType>>,
-	native_type_id_to_id: HashMap<u64, TypeId>,
+	native_type_id_to_id: HashMap<u128, TypeId>,
 }
 
 impl TypesCollector {
@@ -76,19 +76,19 @@ compile_error!("stable and nightly features cannot both be enabled");
 compile_error!("either stable or nightly feature must be enabled");
 
 #[cfg(feature = "nightly")]
-fn type_id_of<T: 'static + ?Sized>() -> u64 {
+fn type_id_of<T: 'static + ?Sized>() -> u128 {
 	use std::intrinsics::type_id;
 	type_id::<T>()
 }
 
 #[cfg(all(feature = "stable", not(feature = "nightly")))]
-fn type_id_of<T: 'static + ?Sized>() -> u64 {
+fn type_id_of<T: 'static + ?Sized>() -> u128 {
 	// Hacky way to get Rust's native type ID without nightly.
-	// `std::any::TypeId` does not expose any direct way to get the actual u64 ID.
+	// `std::any::TypeId` does not expose any direct way to get the actual u128 ID.
 	use std::any;
 
 	use regex::Regex;
 	let id = format!("{:?}", any::TypeId::of::<T>());
 	let regex = Regex::new(r"^TypeId\s*\{\s*t:\s*(\d+)\s*\}$").unwrap();
-	regex.captures(&id).unwrap()[1].parse::<u64>().unwrap()
+	regex.captures(&id).unwrap()[1].parse::<u128>().unwrap()
 }
