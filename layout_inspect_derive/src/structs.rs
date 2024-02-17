@@ -96,11 +96,7 @@ pub fn derive_struct(data: DataStruct, ident: Ident, mut generics: Generics) -> 
 }
 
 fn get_named_field_defs(fields: FieldsNamed) -> Vec<TokenStream> {
-	fields
-		.named
-		.iter()
-		.map(|field| get_named_field_def(field))
-		.collect()
+	fields.named.iter().map(get_named_field_def).collect()
 }
 
 fn get_named_field_def(field: &Field) -> TokenStream {

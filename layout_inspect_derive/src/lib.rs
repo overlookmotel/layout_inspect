@@ -1,4 +1,3 @@
-use proc_macro2;
 use syn::{parse_macro_input, Data, DeriveInput};
 
 mod structs;
