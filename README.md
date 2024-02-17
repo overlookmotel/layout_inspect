@@ -110,3 +110,9 @@ let json = serde_json::to_string(&types).unwrap();
 ```json
 [{"kind":"struct","name":"Foo","size":24,"align":8,"fields":[...]},...]
 ```
+
+### `unique_names`
+
+Use this feature if all the types being inspected have unique type names.
+
+Required if any types being inspected have lifetime params e.g. `struct Foo<'a>(&'a str)`.

@@ -22,8 +22,18 @@ pub fn inspect<T: Inspect + ?Sized>() -> Vec<DefType> {
 	collector.into_types()
 }
 
-// `'static` bound required by `any::TypeId::of()`
+#[cfg(not(feature = "unique_names"))]
+// `'static` bound required by `any::TypeId::of`
 pub trait Inspect: 'static {
+	fn name() -> String;
+	fn size() -> Option<usize>;
+	fn align() -> Option<usize>;
+	fn def(collector: &mut TypesCollector) -> DefType;
+}
+
+#[cfg(feature = "unique_names")]
+// `any::TypeId::of` not used, so no need for `'static` bound
+pub trait Inspect {
 	fn name() -> String;
 	fn size() -> Option<usize>;
 	fn align() -> Option<usize>;
@@ -32,7 +42,7 @@ pub trait Inspect: 'static {
 
 pub struct TypesCollector {
 	types: Vec<Option<DefType>>,
-	native_type_id_to_id: HashMap<u128, TypeId>,
+	native_type_id_to_id: HashMap<String, TypeId>,
 }
 
 impl TypesCollector {
@@ -75,14 +85,18 @@ compile_error!("stable and nightly features cannot both be enabled");
 #[cfg(not(any(feature = "stable", feature = "nightly")))]
 compile_error!("either stable or nightly feature must be enabled");
 
-#[cfg(feature = "nightly")]
-fn type_id_of<T: 'static + ?Sized>() -> u128 {
+#[cfg(all(feature = "nightly", not(feature = "unique_names")))]
+fn type_id_of<T: 'static + ?Sized>() -> String {
 	use std::intrinsics::type_id;
-	type_id::<T>()
+	type_id::<T>().to_string()
 }
 
-#[cfg(all(feature = "stable", not(feature = "nightly")))]
-fn type_id_of<T: 'static + ?Sized>() -> u128 {
+#[cfg(all(
+	feature = "stable",
+	not(feature = "nightly"),
+	not(feature = "unique_names")
+))]
+fn type_id_of<T: 'static + ?Sized>() -> String {
 	// Hacky way to get Rust's native type ID without nightly.
 	// `std::any::TypeId` does not expose any direct way to get the actual u128 ID.
 	use std::any;
@@ -90,5 +104,11 @@ fn type_id_of<T: 'static + ?Sized>() -> u128 {
 	use regex::Regex;
 	let id = format!("{:?}", any::TypeId::of::<T>());
 	let regex = Regex::new(r"^TypeId\s*\{\s*t:\s*(\d+)\s*\}$").unwrap();
-	regex.captures(&id).unwrap()[1].parse::<u128>().unwrap()
+	regex.captures(&id).unwrap()[1].to_string()
+}
+
+// TODO: Tests for this feature
+#[cfg(feature = "unique_names")]
+fn type_id_of<T: Inspect + ?Sized>() -> String {
+	T::name()
 }
