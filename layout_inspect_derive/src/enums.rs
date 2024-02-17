@@ -1,7 +1,10 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use regex::Regex;
-use syn::{AttrStyle, DataEnum, Expr, Fields, FieldsUnnamed, Ident, Lit, Meta};
+use syn::{
+	parse_quote, AttrStyle, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics, Ident,
+	Lit, Meta,
+};
 
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
 // TODO: Support fieldless enums with no value annotation - use discriminant
@@ -17,7 +20,7 @@ use syn::{AttrStyle, DataEnum, Expr, Fields, FieldsUnnamed, Ident, Lit, Meta};
 // Maybe possible to obtain discriminant values for field-ful enums
 // if enum is `#[repr(u../i..)]`.
 
-pub fn derive_enum(data: DataEnum, ident: Ident) -> TokenStream {
+pub fn derive_enum(data: DataEnum, ident: Ident, mut generics: Generics) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
 
 	let variant_defs: Vec<_> = data
@@ -108,6 +111,16 @@ pub fn derive_enum(data: DataEnum, ident: Ident) -> TokenStream {
 		})
 		.collect();
 
+	// Add bound `Inspect` to type params
+	for param in &mut generics.params {
+		if let GenericParam::Type(ref mut type_param) = *param {
+			type_param.bounds.push(parse_quote!(Inspect));
+		}
+	}
+
+	// Return `impl` code
+	let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
+
 	quote! {
 		const _: () = {
 			use ::std::{
@@ -122,7 +135,7 @@ pub fn derive_enum(data: DataEnum, ident: Ident) -> TokenStream {
 			};
 
 			#[automatically_derived]
-			impl Inspect for #ident {
+			impl #impl_generics Inspect for #ident #type_generics #where_clause {
 				fn name() -> String {
 					stringify!(#ident).to_string()
 				}

@@ -14,7 +14,7 @@ pub fn inspect(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 fn inspect_impl(input: DeriveInput) -> proc_macro2::TokenStream {
 	match input.data {
 		Data::Struct(data) => derive_struct(data, input.ident, input.generics),
-		Data::Enum(data) => derive_enum(data, input.ident),
+		Data::Enum(data) => derive_enum(data, input.ident, input.generics),
 		Data::Union(_data) => todo!("Deriving `Inspect` on Unions not supported"),
 	}
 }
