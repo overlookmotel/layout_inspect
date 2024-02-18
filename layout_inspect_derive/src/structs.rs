@@ -13,7 +13,7 @@ pub fn derive_struct(data: DataStruct, ident: Ident, mut generics: Generics) -> 
 	let field_defs: Vec<TokenStream> = match data.fields {
 		Fields::Named(fields) => get_named_field_defs(fields),
 		Fields::Unnamed(_fields) => todo!("Unnamed struct fields not supported"),
-		Fields::Unit => todo!("Unit struct fields not supported"),
+		Fields::Unit => vec![],
 	};
 
 	// Add bound `Inspect` to type params

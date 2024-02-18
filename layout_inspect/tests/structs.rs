@@ -53,6 +53,22 @@ fn struct_empty() {
 }
 
 #[test]
+fn struct_unit() {
+	#[derive(Inspect)]
+	struct Foo;
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			size: Some(0),
+			align: Some(1),
+			fields: vec![]
+		})
+	);
+}
+
+#[test]
 fn struct_multiple_fields() {
 	#[derive(Inspect)]
 	struct Foo {
