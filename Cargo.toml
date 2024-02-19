@@ -1,2 +1,3 @@
 [workspace]
 members = ["layout_inspect", "layout_inspect_derive"]
+resolver = "2"
