@@ -5,7 +5,7 @@ use structs::derive_struct;
 mod enums;
 use enums::derive_enum;
 
-#[proc_macro_derive(Inspect)]
+#[proc_macro_derive(Inspect, attributes(serde))]
 pub fn inspect(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
 	let input = parse_macro_input!(input as DeriveInput);
 	inspect_impl(input).into()

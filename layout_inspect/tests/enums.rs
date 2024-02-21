@@ -47,9 +47,7 @@ fn enum_fieldless() {
 
 #[test]
 fn enum_fieldless_with_serde_variant_rename() {
-	use serde::{Deserialize, Serialize};
-
-	#[derive(Inspect, Deserialize, Serialize)]
+	#[derive(Inspect)]
 	enum Foo {
 		#[serde(rename = "o1")]
 		Opt1,

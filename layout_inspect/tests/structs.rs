@@ -313,9 +313,7 @@ fn struct_generic_two_type_params() {
 
 #[test]
 fn struct_with_serde_field_rename() {
-	use serde::{Deserialize, Serialize};
-
-	#[derive(Inspect, Deserialize, Serialize)]
+	#[derive(Inspect)]
 	struct Foo {
 		#[serde(rename = "bar")]
 		num: u8,
@@ -340,15 +338,13 @@ fn struct_with_serde_field_rename() {
 
 #[test]
 fn struct_with_serde_field_flatten() {
-	use serde::{Deserialize, Serialize};
-
-	#[derive(Inspect, Deserialize, Serialize)]
+	#[derive(Inspect)]
 	struct Foo {
 		#[serde(flatten)]
 		bar: Bar,
 	}
 
-	#[derive(Inspect, Deserialize, Serialize)]
+	#[derive(Inspect)]
 	struct Bar {
 		num: u8,
 	}
@@ -372,15 +368,13 @@ fn struct_with_serde_field_flatten() {
 
 #[test]
 fn struct_with_serde_field_rename_and_flatten() {
-	use serde::{Deserialize, Serialize};
-
-	#[derive(Inspect, Deserialize, Serialize)]
+	#[derive(Inspect)]
 	struct Foo {
 		#[serde(flatten, rename = "qux")]
 		bar: Bar,
 	}
 
-	#[derive(Inspect, Deserialize, Serialize)]
+	#[derive(Inspect)]
 	struct Bar {
 		num: u8,
 	}
@@ -404,9 +398,7 @@ fn struct_with_serde_field_rename_and_flatten() {
 
 #[test]
 fn struct_with_serde_field_default() {
-	use serde::{Deserialize, Serialize};
-
-	#[derive(Inspect, Deserialize, Serialize)]
+	#[derive(Inspect)]
 	struct Foo {
 		#[serde(default)]
 		num: u8,
