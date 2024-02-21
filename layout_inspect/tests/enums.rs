@@ -10,9 +10,7 @@ fn enum_fieldless() {
 	#[derive(Inspect)]
 	#[allow(dead_code)]
 	enum Foo {
-		/// `o1`
 		Opt1,
-		/// `o2`
 		Opt2,
 	}
 
@@ -26,13 +24,13 @@ fn enum_fieldless() {
 				DefEnumVariant {
 					name: "Opt1".to_string(),
 					discriminant: 0,
-					ser_value: Some("o1".to_string()),
+					ser_value: Some("Opt1".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt2".to_string(),
 					discriminant: 1,
-					ser_value: Some("o2".to_string()),
+					ser_value: Some("Opt2".to_string()),
 					value_type_id: None
 				},
 			],
@@ -52,13 +50,9 @@ fn enum_fieldless_with_discriminants() {
 	#[derive(Inspect)]
 	#[allow(dead_code)]
 	enum Foo {
-		/// `o1`
 		Opt1 = 5,
-		/// `o2`
 		Opt2 = 10,
-		/// `o3`
 		Opt3,
-		/// `o4`
 		Opt4,
 	}
 
@@ -72,25 +66,25 @@ fn enum_fieldless_with_discriminants() {
 				DefEnumVariant {
 					name: "Opt1".to_string(),
 					discriminant: 5,
-					ser_value: Some("o1".to_string()),
+					ser_value: Some("Opt1".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt2".to_string(),
 					discriminant: 10,
-					ser_value: Some("o2".to_string()),
+					ser_value: Some("Opt2".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt3".to_string(),
 					discriminant: 11,
-					ser_value: Some("o3".to_string()),
+					ser_value: Some("Opt3".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {
 					name: "Opt4".to_string(),
 					discriminant: 12,
-					ser_value: Some("o4".to_string()),
+					ser_value: Some("Opt4".to_string()),
 					value_type_id: None
 				},
 			],
@@ -151,7 +145,6 @@ fn enum_mixed_fieldless_and_fieldful() {
 	#[derive(Inspect)]
 	#[allow(dead_code)]
 	enum Foo {
-		/// `o1`
 		Opt1,
 		Opt2(u8),
 	}
@@ -168,7 +161,7 @@ fn enum_mixed_fieldless_and_fieldful() {
 				DefEnumVariant {
 					name: "Opt1".to_string(),
 					discriminant: 0,
-					ser_value: Some("o1".to_string()),
+					ser_value: Some("Opt1".to_string()),
 					value_type_id: None
 				},
 				DefEnumVariant {

@@ -1,13 +1,8 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use regex::Regex;
-use syn::{
-	parse_quote, AttrStyle, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics, Ident,
-	Lit, Meta,
-};
+use syn::{parse_quote, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics, Ident, Lit};
 
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
-// TODO: Support fieldless enums with no value annotation - use discriminant
 // TODO: Support `#[serde(rename_all = "camelCase")]` (and other cases)
 // https://serde.rs/container-attrs.html#rename_all
 // TODO: Should `discriminant` be `i64` not `u64`?
@@ -29,47 +24,8 @@ pub fn derive_enum(data: DataEnum, ident: Ident, mut generics: Generics) -> Toke
 		.map(|variant| {
 			let (ser_value, value_type_id) = match variant.fields {
 				Fields::Unit => {
-					let doc_comments: Vec<_> = variant
-						.attrs
-						.into_iter()
-						.filter(|attr| attr.style == AttrStyle::Outer && attr.path.is_ident("doc"))
-						.collect();
-					assert!(
-						doc_comments.len() == 1,
-						"{} enum {} option has {} value doc comment",
-						ident,
-						variant.ident,
-						match doc_comments.len() {
-							0 => "no",
-							_ => "more than one",
-						},
-					);
-
-					let meta = doc_comments[0].parse_meta().unwrap();
-					let ser_value = match meta {
-						Meta::NameValue(name_value) => {
-							match name_value.lit {
-								Lit::Str(s) => s.value(),
-								_ => {
-									panic!(
-										"Unexpected value doc comment for {} enum {} option",
-										ident, variant.ident
-									)
-								}
-							}
-						}
-						_ => {
-							panic!(
-								"Unexpected value doc comment for {} enum {} option",
-								ident, variant.ident
-							)
-						}
-					};
-
-					let regex = Regex::new("^ `(.+)`$").unwrap();
-					let ser_value = &regex.captures(&ser_value).unwrap()[1];
-
-					let ser_value = quote! { Some(#ser_value.to_string()) };
+					let variant_ident = &variant.ident;
+					let ser_value = quote! { Some(stringify!(#variant_ident).to_string()) };
 					let value_type_id = quote! { None };
 					(ser_value, value_type_id)
 				}
