@@ -46,6 +46,49 @@ fn enum_fieldless() {
 }
 
 #[test]
+fn enum_fieldless_with_serde_variant_rename() {
+	use serde::{Deserialize, Serialize};
+
+	#[derive(Inspect, Deserialize, Serialize)]
+	enum Foo {
+		#[serde(rename = "o1")]
+		Opt1,
+		#[serde(rename = "o2")]
+		Opt2,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			size: 1,
+			align: 1,
+			variants: vec![
+				DefEnumVariant {
+					name: "Opt1".to_string(),
+					discriminant: 0,
+					ser_value: Some("o1".to_string()),
+					value_type_id: None
+				},
+				DefEnumVariant {
+					name: "Opt2".to_string(),
+					discriminant: 1,
+					ser_value: Some("o2".to_string()),
+					value_type_id: None
+				},
+			],
+		})
+	);
+
+	// Check discriminants are correct
+	fn to_u8(foo: Foo) -> u8 {
+		unsafe { transmute(foo) }
+	}
+	assert_eq!(to_u8(Foo::Opt1), 0);
+	assert_eq!(to_u8(Foo::Opt2), 1);
+}
+
+#[test]
 fn enum_fieldless_with_discriminants() {
 	#[derive(Inspect)]
 	#[allow(dead_code)]

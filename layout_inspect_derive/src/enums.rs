@@ -1,6 +1,9 @@
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse_quote, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics, Ident, Lit};
+use syn::{
+	parse_quote, AttrStyle, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics, Ident,
+	Lit, Meta, NestedMeta,
+};
 
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
 // TODO: Support `#[serde(rename_all = "camelCase")]` (and other cases)
@@ -24,8 +27,29 @@ pub fn derive_enum(data: DataEnum, ident: Ident, mut generics: Generics) -> Toke
 		.map(|variant| {
 			let (ser_value, value_type_id) = match variant.fields {
 				Fields::Unit => {
-					let variant_ident = &variant.ident;
-					let ser_value = quote! { Some(stringify!(#variant_ident).to_string()) };
+					let mut ser_value = variant.ident.to_string();
+
+					// Find `#[serde(rename)]` attribute
+					for attr in &variant.attrs {
+						if attr.style == AttrStyle::Outer && attr.path.is_ident("serde") {
+							let meta = attr.parse_meta().unwrap();
+							if let Meta::List(list) = meta {
+								for item in list.nested {
+									if let NestedMeta::Meta(Meta::NameValue(name_value)) = item {
+										if name_value.path.is_ident("rename") {
+											if let Lit::Str(s) = name_value.lit {
+												ser_value = s.value();
+											} else {
+												panic!("Unexpected serde rename tag");
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+
+					let ser_value = quote! { Some(#ser_value.to_string()) };
 					let value_type_id = quote! { None };
 					(ser_value, value_type_id)
 				}
