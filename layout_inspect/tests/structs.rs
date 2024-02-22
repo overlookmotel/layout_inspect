@@ -337,6 +337,50 @@ fn struct_with_serde_field_rename() {
 }
 
 #[test]
+fn struct_with_serde_fields_rename_all() {
+	#[derive(Inspect)]
+	#[serde(rename_all = "camelCase")]
+	struct Foo {
+		field_one: u8,
+		field_two: u8,
+		#[serde(rename = "field_three_oh_yes")]
+		field_three: u8,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![
+				DefStructField {
+					name: "field_one".to_string(),
+					ser_name: "fieldOne".to_string(),
+					type_id: 1,
+					offset: 0,
+					flatten: false,
+				},
+				DefStructField {
+					name: "field_two".to_string(),
+					ser_name: "fieldTwo".to_string(),
+					type_id: 1,
+					offset: 1,
+					flatten: false,
+				},
+				DefStructField {
+					name: "field_three".to_string(),
+					ser_name: "field_three_oh_yes".to_string(),
+					type_id: 1,
+					offset: 2,
+					flatten: false,
+				},
+			],
+		})
+	);
+}
+
+#[test]
 fn struct_with_serde_field_flatten() {
 	#[derive(Inspect)]
 	struct Foo {

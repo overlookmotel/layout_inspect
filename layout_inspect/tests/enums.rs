@@ -47,6 +47,7 @@ fn enum_fieldless() {
 
 #[test]
 fn enum_fieldless_with_serde_variant_rename() {
+	#[allow(dead_code)]
 	#[derive(Inspect)]
 	enum Foo {
 		#[serde(rename = "o1")]
@@ -77,13 +78,48 @@ fn enum_fieldless_with_serde_variant_rename() {
 			],
 		})
 	);
+}
 
-	// Check discriminants are correct
-	fn to_u8(foo: Foo) -> u8 {
-		unsafe { transmute(foo) }
+#[test]
+fn enum_fieldless_with_serde_variants_rename_all() {
+	#[allow(dead_code, clippy::enum_variant_names)]
+	#[derive(Inspect)]
+	#[serde(rename_all = "camelCase")]
+	enum Foo {
+		OptOne,
+		OptTwo,
+		#[serde(rename = "opt_three")]
+		OptThree,
 	}
-	assert_eq!(to_u8(Foo::Opt1), 0);
-	assert_eq!(to_u8(Foo::Opt2), 1);
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			size: 1,
+			align: 1,
+			variants: vec![
+				DefEnumVariant {
+					name: "OptOne".to_string(),
+					discriminant: 0,
+					ser_value: Some("optOne".to_string()),
+					value_type_id: None
+				},
+				DefEnumVariant {
+					name: "OptTwo".to_string(),
+					discriminant: 1,
+					ser_value: Some("optTwo".to_string()),
+					value_type_id: None
+				},
+				DefEnumVariant {
+					name: "OptThree".to_string(),
+					discriminant: 2,
+					ser_value: Some("opt_three".to_string()),
+					value_type_id: None
+				},
+			],
+		})
+	);
 }
 
 #[test]

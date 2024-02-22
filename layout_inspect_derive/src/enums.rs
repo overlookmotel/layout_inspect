@@ -1,13 +1,13 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
-	parse_quote, AttrStyle, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics, Ident,
-	Lit, Meta, NestedMeta,
+	parse_quote, AttrStyle, Attribute, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics,
+	Ident, Lit, Meta, NestedMeta,
 };
 
+use crate::rename::{get_rename_all_attr, rename};
+
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
-// TODO: Support `#[serde(rename_all = "camelCase")]` (and other cases)
-// https://serde.rs/container-attrs.html#rename_all
 // TODO: Should `discriminant` be `i64` not `u64`?
 // TODO: For fieldless enums, use e.g. `Foo::Bar as u64` to get discriminants.
 // Discrimants can be defined as a const expression which we can't parse
@@ -18,8 +18,15 @@ use syn::{
 // Maybe possible to obtain discriminant values for field-ful enums
 // if enum is `#[repr(u../i..)]`.
 
-pub fn derive_enum(data: DataEnum, ident: Ident, mut generics: Generics) -> TokenStream {
+pub fn derive_enum(
+	data: DataEnum,
+	ident: Ident,
+	mut generics: Generics,
+	attrs: Vec<Attribute>,
+) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
+
+	let rename_all = get_rename_all_attr(&attrs);
 
 	let variant_defs: Vec<_> = data
 		.variants
@@ -27,9 +34,8 @@ pub fn derive_enum(data: DataEnum, ident: Ident, mut generics: Generics) -> Toke
 		.map(|variant| {
 			let (ser_value, value_type_id) = match variant.fields {
 				Fields::Unit => {
-					let mut ser_value = variant.ident.to_string();
-
 					// Find `#[serde(rename)]` attribute
+					let mut ser_value = None;
 					for attr in &variant.attrs {
 						if attr.style == AttrStyle::Outer && attr.path.is_ident("serde") {
 							let meta = attr.parse_meta().unwrap();
@@ -38,7 +44,7 @@ pub fn derive_enum(data: DataEnum, ident: Ident, mut generics: Generics) -> Toke
 									if let NestedMeta::Meta(Meta::NameValue(name_value)) = item {
 										if name_value.path.is_ident("rename") {
 											if let Lit::Str(s) = name_value.lit {
-												ser_value = s.value();
+												ser_value = Some(s.value());
 											} else {
 												panic!("Unexpected serde rename tag");
 											}
@@ -48,6 +54,16 @@ pub fn derive_enum(data: DataEnum, ident: Ident, mut generics: Generics) -> Toke
 							}
 						}
 					}
+
+					// Get varient value, optionally applying `rename_all` transform.
+					// `serde(rename)` on varient takes precedence.
+					let ser_value = ser_value.unwrap_or_else(|| {
+						let mut ser_value = variant.ident.to_string();
+						if let Some(rename_all) = &rename_all {
+							ser_value = rename(&ser_value, rename_all)
+						}
+						ser_value
+					});
 
 					let ser_value = quote! { Some(#ser_value.to_string()) };
 					let value_type_id = quote! { None };

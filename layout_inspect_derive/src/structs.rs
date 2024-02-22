@@ -1,17 +1,23 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
-	parse_quote, AttrStyle, DataStruct, Field, Fields, FieldsNamed, GenericParam, Generics, Ident,
-	Lit, Meta, NestedMeta,
+	parse_quote, AttrStyle, Attribute, DataStruct, Field, Fields, FieldsNamed, GenericParam,
+	Generics, Ident, Lit, Meta, NestedMeta,
 };
 
-// TODO: Support `#[serde(rename_all = "camelCase")]` (and other variants)
-// https://serde.rs/container-attrs.html#rename_all
+use crate::rename::{get_rename_all_attr, rename};
 
-pub fn derive_struct(data: DataStruct, ident: Ident, mut generics: Generics) -> TokenStream {
+pub fn derive_struct(
+	data: DataStruct,
+	ident: Ident,
+	mut generics: Generics,
+	attrs: Vec<Attribute>,
+) -> TokenStream {
+	let rename_all = get_rename_all_attr(&attrs);
+
 	// Get field definitions
 	let field_defs: Vec<TokenStream> = match data.fields {
-		Fields::Named(fields) => get_named_field_defs(fields),
+		Fields::Named(fields) => get_named_field_defs(fields, &rename_all),
 		Fields::Unnamed(_fields) => todo!("Unnamed struct fields not supported"),
 		Fields::Unit => vec![],
 	};
@@ -95,11 +101,15 @@ pub fn derive_struct(data: DataStruct, ident: Ident, mut generics: Generics) -> 
 	}
 }
 
-fn get_named_field_defs(fields: FieldsNamed) -> Vec<TokenStream> {
-	fields.named.iter().map(get_named_field_def).collect()
+fn get_named_field_defs(fields: FieldsNamed, rename_all: &Option<String>) -> Vec<TokenStream> {
+	fields
+		.named
+		.iter()
+		.map(|field| get_named_field_def(field, rename_all))
+		.collect()
 }
 
-fn get_named_field_def(field: &Field) -> TokenStream {
+fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStream {
 	// Get field name
 	let name = field.ident.as_ref().expect("Missing field name");
 
@@ -139,7 +149,15 @@ fn get_named_field_def(field: &Field) -> TokenStream {
 		}
 	}
 
-	let ser_name = ser_name.unwrap_or_else(|| name.to_string());
+	// Get field name, optionally applying `rename_all` transform.
+	// `serde(rename)` on field takes precedence.
+	let ser_name = ser_name.unwrap_or_else(|| {
+		let mut ser_name = name.to_string();
+		if let Some(rename_all) = &rename_all {
+			ser_name = rename(&ser_name, rename_all);
+		}
+		ser_name
+	});
 
 	// Return field def
 	let ty = &field.ty;
