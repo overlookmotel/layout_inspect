@@ -7,8 +7,8 @@ use layout_inspect::{
 
 #[test]
 fn enum_fieldless() {
-	#[derive(Inspect)]
 	#[allow(dead_code)]
+	#[derive(Inspect)]
 	enum Foo {
 		Opt1,
 		Opt2,
@@ -18,6 +18,49 @@ fn enum_fieldless() {
 		inspect::<Foo>()[0],
 		DefType::Enum(DefEnum {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: 1,
+			align: 1,
+			variants: vec![
+				DefEnumVariant {
+					name: "Opt1".to_string(),
+					discriminant: 0,
+					ser_value: Some("Opt1".to_string()),
+					value_type_id: None
+				},
+				DefEnumVariant {
+					name: "Opt2".to_string(),
+					discriminant: 1,
+					ser_value: Some("Opt2".to_string()),
+					value_type_id: None
+				},
+			],
+		})
+	);
+
+	// Check discriminants are correct
+	fn to_u8(foo: Foo) -> u8 {
+		unsafe { transmute(foo) }
+	}
+	assert_eq!(to_u8(Foo::Opt1), 0);
+	assert_eq!(to_u8(Foo::Opt2), 1);
+}
+
+#[test]
+fn enum_fieldless_with_serde_type_rename() {
+	#[allow(dead_code)]
+	#[derive(Inspect)]
+	#[serde(rename = "Bar")]
+	enum Foo {
+		Opt1,
+		Opt2,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			ser_name: "Bar".to_string(),
 			size: 1,
 			align: 1,
 			variants: vec![
@@ -60,6 +103,7 @@ fn enum_fieldless_with_serde_variant_rename() {
 		inspect::<Foo>()[0],
 		DefType::Enum(DefEnum {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: 1,
 			align: 1,
 			variants: vec![
@@ -96,6 +140,7 @@ fn enum_fieldless_with_serde_variants_rename_all() {
 		inspect::<Foo>()[0],
 		DefType::Enum(DefEnum {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: 1,
 			align: 1,
 			variants: vec![
@@ -124,8 +169,8 @@ fn enum_fieldless_with_serde_variants_rename_all() {
 
 #[test]
 fn enum_fieldless_with_discriminants() {
-	#[derive(Inspect)]
 	#[allow(dead_code)]
+	#[derive(Inspect)]
 	enum Foo {
 		Opt1 = 5,
 		Opt2 = 10,
@@ -137,6 +182,7 @@ fn enum_fieldless_with_discriminants() {
 		inspect::<Foo>()[0],
 		DefType::Enum(DefEnum {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: 1,
 			align: 1,
 			variants: vec![
@@ -180,8 +226,8 @@ fn enum_fieldless_with_discriminants() {
 
 #[test]
 fn enum_fieldful() {
-	#[derive(Inspect)]
 	#[allow(dead_code)]
+	#[derive(Inspect)]
 	enum Foo {
 		Opt1(u8),
 		Opt2(u16),
@@ -193,6 +239,7 @@ fn enum_fieldful() {
 		&type_defs[0],
 		&DefType::Enum(DefEnum {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: size_of::<Foo>(),
 			align: align_of::<Foo>(),
 			variants: vec![
@@ -219,8 +266,8 @@ fn enum_fieldful() {
 
 #[test]
 fn enum_mixed_fieldless_and_fieldful() {
-	#[derive(Inspect)]
 	#[allow(dead_code)]
+	#[derive(Inspect)]
 	enum Foo {
 		Opt1,
 		Opt2(u8),
@@ -232,6 +279,7 @@ fn enum_mixed_fieldless_and_fieldful() {
 		&type_defs[0],
 		&DefType::Enum(DefEnum {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: 2,
 			align: 1,
 			variants: vec![

@@ -5,7 +5,7 @@ use syn::{
 	Generics, Ident, Lit, Meta, NestedMeta,
 };
 
-use crate::rename::{get_rename_all_attr, rename};
+use crate::rename::{get_rename_attrs, rename};
 
 pub fn derive_struct(
 	data: DataStruct,
@@ -13,7 +13,7 @@ pub fn derive_struct(
 	mut generics: Generics,
 	attrs: Vec<Attribute>,
 ) -> TokenStream {
-	let rename_all = get_rename_all_attr(&attrs);
+	let (ser_name, rename_all) = get_rename_attrs(&attrs);
 
 	// Get field definitions
 	let field_defs: Vec<TokenStream> = match data.fields {
@@ -54,6 +54,13 @@ pub fn derive_struct(
 	} else {
 		quote! {}
 	};
+	let name = quote! { stringify!(#ident).to_string() #sub_types_str };
+
+	let ser_name = if let Some(ser_name) = ser_name {
+		quote! { #ser_name.to_string() }
+	} else {
+		name.clone()
+	};
 
 	// Return `impl` code
 	let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
@@ -75,7 +82,7 @@ pub fn derive_struct(
 			#[automatically_derived]
 			impl #impl_generics Inspect for #ident #type_generics #where_clause {
 				fn name() -> String {
-					stringify!(#ident).to_string() #sub_types_str
+					#name
 				}
 
 				// TODO: Allow deriving for unsized types
@@ -91,6 +98,7 @@ pub fn derive_struct(
 				fn def(collector: &mut TypesCollector) -> DefType {
 					DefType::Struct(DefStruct {
 						name: <Self as Inspect>::name(),
+						ser_name: #ser_name,
 						size: <Self as Inspect>::size(),
 						align: <Self as Inspect>::align(),
 						fields: vec![#(#field_defs),*],

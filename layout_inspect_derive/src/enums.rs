@@ -5,7 +5,7 @@ use syn::{
 	Ident, Lit, Meta, NestedMeta,
 };
 
-use crate::rename::{get_rename_all_attr, rename};
+use crate::rename::{get_rename_attrs, rename};
 
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
 // TODO: Should `discriminant` be `i64` not `u64`?
@@ -26,7 +26,8 @@ pub fn derive_enum(
 ) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
 
-	let rename_all = get_rename_all_attr(&attrs);
+	let (ser_name, rename_all) = get_rename_attrs(&attrs);
+	let ser_name = ser_name.unwrap_or_else(|| ident.to_string());
 
 	let variant_defs: Vec<_> = data
 		.variants
@@ -147,6 +148,7 @@ pub fn derive_enum(
 				fn def(collector: &mut TypesCollector) -> DefType {
 					DefType::Enum(DefEnum {
 						name: <Self as Inspect>::name(),
+						ser_name: #ser_name.to_string(),
 						size: <Self as Inspect>::size().unwrap(),
 						align: <Self as Inspect>::align().unwrap(),
 						variants: vec![#(#variant_defs),*],

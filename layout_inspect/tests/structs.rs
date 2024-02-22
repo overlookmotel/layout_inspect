@@ -20,6 +20,7 @@ fn struct_single_field() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
@@ -45,6 +46,7 @@ fn struct_empty() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(0),
 			align: Some(1),
 			fields: vec![]
@@ -61,6 +63,7 @@ fn struct_unit() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(0),
 			align: Some(1),
 			fields: vec![]
@@ -84,6 +87,7 @@ fn struct_multiple_fields() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![
@@ -145,6 +149,7 @@ fn struct_generic_one_type_param() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![
@@ -172,6 +177,7 @@ fn struct_generic_one_type_param() {
 		bar_u32_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u32>".to_string(),
+			ser_name: "Bar<u32>".to_string(),
 			size: Some(size_of::<Bar<u32>>()),
 			align: Some(align_of::<Bar<u32>>()),
 			fields: vec![DefStructField {
@@ -192,6 +198,7 @@ fn struct_generic_one_type_param() {
 		bar_u8_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u8>".to_string(),
+			ser_name: "Bar<u8>".to_string(),
 			size: Some(size_of::<Bar<u8>>()),
 			align: Some(align_of::<Bar<u8>>()),
 			fields: vec![DefStructField {
@@ -228,6 +235,7 @@ fn struct_generic_two_type_params() {
 		&type_defs[0],
 		&DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![
@@ -255,6 +263,7 @@ fn struct_generic_two_type_params() {
 		bar_u64_u32_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u64,u32>".to_string(),
+			ser_name: "Bar<u64,u32>".to_string(),
 			size: Some(size_of::<Bar<u64, u32>>()),
 			align: Some(align_of::<Bar<u64, u32>>()),
 			fields: vec![
@@ -285,6 +294,7 @@ fn struct_generic_two_type_params() {
 		bar_u16_u8_def,
 		&DefType::Struct(DefStruct {
 			name: "Bar<u16,u8>".to_string(),
+			ser_name: "Bar<u16,u8>".to_string(),
 			size: Some(size_of::<Bar<u16, u8>>()),
 			align: Some(align_of::<Bar<u16, u8>>()),
 			fields: vec![
@@ -312,6 +322,32 @@ fn struct_generic_two_type_params() {
 }
 
 #[test]
+fn struct_with_serde_type_rename() {
+	#[derive(Inspect)]
+	#[serde(rename = "Bar")]
+	struct Foo {
+		num: u8,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Bar".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![DefStructField {
+				name: "num".to_string(),
+				ser_name: "num".to_string(),
+				type_id: 1,
+				offset: 0,
+				flatten: false,
+			}]
+		})
+	);
+}
+
+#[test]
 fn struct_with_serde_field_rename() {
 	#[derive(Inspect)]
 	struct Foo {
@@ -323,6 +359,7 @@ fn struct_with_serde_field_rename() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
@@ -351,6 +388,7 @@ fn struct_with_serde_fields_rename_all() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![
@@ -397,6 +435,7 @@ fn struct_with_serde_field_flatten() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
@@ -427,6 +466,7 @@ fn struct_with_serde_field_rename_and_flatten() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {
@@ -452,6 +492,7 @@ fn struct_with_serde_field_default() {
 		inspect::<Foo>()[0],
 		DefType::Struct(DefStruct {
 			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
 			size: Some(size_of::<Foo>()),
 			align: Some(align_of::<Foo>()),
 			fields: vec![DefStructField {

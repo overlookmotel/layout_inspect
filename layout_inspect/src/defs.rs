@@ -140,6 +140,7 @@ pub struct DefPrimitive {
 #[apply(def)]
 pub struct DefStruct {
 	pub name: String,
+	pub ser_name: String,
 	pub size: Option<usize>,
 	pub align: Option<usize>,
 	pub fields: Vec<DefStructField>,
@@ -157,6 +158,7 @@ pub struct DefStructField {
 #[apply(def)]
 pub struct DefEnum {
 	pub name: String,
+	pub ser_name: String,
 	pub size: usize,
 	pub align: usize,
 	pub variants: Vec<DefEnumVariant>,
