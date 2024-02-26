@@ -136,6 +136,48 @@ fn struct_multiple_fields() {
 }
 
 #[test]
+fn struct_raw_identifier_field_name() {
+	#[derive(Inspect)]
+	struct Foo {
+		r#type: u8,
+		r#enum: u8,
+	}
+
+	let type_defs = inspect::<Foo>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![
+				DefStructField {
+					name: "type".to_string(),
+					ser_name: "type".to_string(),
+					type_id: 1,
+					offset: 0,
+					flatten: false,
+					skip: false,
+				},
+				DefStructField {
+					name: "enum".to_string(),
+					ser_name: "enum".to_string(),
+					type_id: 1,
+					offset: 1,
+					flatten: false,
+					skip: false,
+				}
+			]
+		})
+	);
+
+	let field_ids = get_field_ids(&type_defs[0]);
+	assert_eq!(type_defs[field_ids[0]].name(), "u8");
+}
+
+#[test]
 fn struct_generic_one_type_param() {
 	#[derive(Inspect)]
 	struct Foo {
@@ -396,7 +438,7 @@ fn struct_with_serde_fields_rename_all() {
 	#[serde(rename_all = "camelCase")]
 	struct Foo {
 		field_one: u8,
-		field_two: u8,
+		r#field_two: u8,
 		#[serde(rename = "field_three_oh_yes")]
 		field_three: u8,
 	}

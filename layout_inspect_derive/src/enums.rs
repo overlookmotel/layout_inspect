@@ -6,7 +6,7 @@ use syn::{
 
 use crate::{
 	attrs::{get_serde_attrs, SerdeAttrs},
-	rename::get_ser_name,
+	rename::{get_ident_name, get_ser_name},
 };
 
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
@@ -39,6 +39,8 @@ pub fn derive_enum(
 		.variants
 		.into_iter()
 		.map(|variant| {
+			let name = get_ident_name(&variant.ident);
+
 			let (ser_value, value_type_id) = match variant.fields {
 				Fields::Unit => {
 					let SerdeAttrs {
@@ -47,7 +49,7 @@ pub fn derive_enum(
 
 					// Get varient value, optionally applying `rename_all` transform.
 					// `serde(rename)` on varient takes precedence.
-					let ser_value = get_ser_name(&variant.ident, &ser_value, &rename_all);
+					let ser_value = get_ser_name(&name, &ser_value, &rename_all);
 					let ser_value = quote! { Some(#ser_value.to_string()) };
 					let value_type_id = quote! { None };
 					(ser_value, value_type_id)
@@ -78,10 +80,9 @@ pub fn derive_enum(
 			};
 			next_discriminant = discriminant + 1;
 
-			let variant_ident = variant.ident;
 			quote! {
 				DefEnumVariant {
-					name: stringify!(#variant_ident).to_string(),
+					name: #name.to_string(),
 					discriminant: #discriminant,
 					ser_value: #ser_value,
 					value_type_id: #value_type_id,

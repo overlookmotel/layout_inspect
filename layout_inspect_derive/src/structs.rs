@@ -6,7 +6,7 @@ use syn::{
 
 use crate::{
 	attrs::{get_serde_attrs, SerdeAttrs},
-	rename::get_ser_name,
+	rename::{get_ident_name, get_ser_name},
 };
 
 pub fn derive_struct(
@@ -124,7 +124,8 @@ fn get_named_field_defs(fields: FieldsNamed, rename_all: &Option<String>) -> Vec
 }
 
 fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStream {
-	let name = field.ident.as_ref().expect("Missing field name");
+	let ident = field.ident.as_ref().expect("Missing field name");
+	let name = get_ident_name(ident);
 
 	let SerdeAttrs {
 		rename: ser_name,
@@ -135,15 +136,15 @@ fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStrea
 
 	// Get field name, optionally applying `rename_all` transform.
 	// `serde(rename)` on field takes precedence.
-	let ser_name = get_ser_name(name, &ser_name, rename_all);
+	let ser_name = get_ser_name(&name, &ser_name, rename_all);
 
 	let ty = &field.ty;
 	quote! {
 		DefStructField {
-			name: stringify!(#name).to_string(),
+			name: #name.to_string(),
 			ser_name: #ser_name.to_string(),
 			type_id: collector.collect::<#ty>(),
-			offset: offset_of!(Self, #name),
+			offset: offset_of!(Self, #ident),
 			flatten: #flatten,
 			skip: #skip,
 		}

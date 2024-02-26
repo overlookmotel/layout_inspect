@@ -1,22 +1,25 @@
 use convert_case::{Case, Casing};
 use syn::Ident;
 
+/// Get struct field / enum varient name.
+pub fn get_ident_name(ident: &Ident) -> String {
+	let mut name = ident.to_string();
+	if name.starts_with("r#") {
+		name = name[2..].to_string();
+	}
+	name
+}
+
 /// Get struct field / enum varient serialization name.
 /// `#[serde(rename)` takes priority.
 /// Apply `#[serde(rename_all)` transform.
-pub fn get_ser_name(
-	ident: &Ident,
-	renamed: &Option<String>,
-	rename_all: &Option<String>,
-) -> String {
+pub fn get_ser_name(name: &str, renamed: &Option<String>, rename_all: &Option<String>) -> String {
 	if let Some(name) = renamed {
 		name.clone()
+	} else if let Some(rename_all) = rename_all {
+		rename(name, rename_all)
 	} else {
-		let mut name = ident.to_string();
-		if let Some(rename_all) = &rename_all {
-			name = rename(&name, rename_all)
-		}
-		name
+		name.to_string()
 	}
 }
 

@@ -47,6 +47,40 @@ fn enum_fieldless() {
 }
 
 #[test]
+fn enum_fieldless_raw_identifier_variant_name() {
+	#[allow(dead_code, non_camel_case_types)]
+	#[derive(Inspect)]
+	enum Foo {
+		r#type,
+		r#enum,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: 1,
+			align: 1,
+			variants: vec![
+				DefEnumVariant {
+					name: "type".to_string(),
+					discriminant: 0,
+					ser_value: Some("type".to_string()),
+					value_type_id: None
+				},
+				DefEnumVariant {
+					name: "enum".to_string(),
+					discriminant: 1,
+					ser_value: Some("enum".to_string()),
+					value_type_id: None
+				},
+			],
+		})
+	);
+}
+
+#[test]
 fn enum_fieldless_with_serde_type_rename() {
 	#[allow(dead_code)]
 	#[derive(Inspect)]
@@ -131,7 +165,7 @@ fn enum_fieldless_with_serde_variants_rename_all() {
 	#[serde(rename_all = "camelCase")]
 	enum Foo {
 		OptOne,
-		OptTwo,
+		r#OptTwo,
 		#[serde(rename = "opt_three")]
 		OptThree,
 	}
