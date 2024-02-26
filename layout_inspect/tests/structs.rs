@@ -29,6 +29,7 @@ fn struct_single_field() {
 				type_id: 1,
 				offset: 0,
 				flatten: false,
+				skip: false,
 			}]
 		})
 	);
@@ -96,28 +97,32 @@ fn struct_multiple_fields() {
 					ser_name: "small".to_string(),
 					type_id: 1,
 					offset: size_of::<usize>() * 4 + size_of::<u16>(),
-					flatten: false
+					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "medium".to_string(),
 					ser_name: "medium".to_string(),
 					type_id: 2,
 					offset: size_of::<usize>() * 4,
-					flatten: false
+					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "veccy".to_string(),
 					ser_name: "veccy".to_string(),
 					type_id: 3,
 					offset: 0,
-					flatten: false
+					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "recurse".to_string(),
 					ser_name: "recurse".to_string(),
 					type_id: 4,
 					offset: size_of::<usize>() * 3,
-					flatten: false
+					flatten: false,
+					skip: false,
 				}
 			]
 		})
@@ -158,14 +163,16 @@ fn struct_generic_one_type_param() {
 					ser_name: "big".to_string(),
 					type_id: 1,
 					offset: 0,
-					flatten: false
+					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "small".to_string(),
 					ser_name: "small".to_string(),
 					type_id: 3,
 					offset: size_of::<Bar<u32>>(),
-					flatten: false
+					flatten: false,
+					skip: false,
 				}
 			]
 		})
@@ -185,7 +192,8 @@ fn struct_generic_one_type_param() {
 				ser_name: "inner".to_string(),
 				type_id: 2,
 				offset: 0,
-				flatten: false
+				flatten: false,
+				skip: false,
 			}]
 		})
 	);
@@ -206,7 +214,8 @@ fn struct_generic_one_type_param() {
 				ser_name: "inner".to_string(),
 				type_id: 4,
 				offset: 0,
-				flatten: false
+				flatten: false,
+				skip: false,
 			}]
 		})
 	);
@@ -244,14 +253,16 @@ fn struct_generic_two_type_params() {
 					ser_name: "big".to_string(),
 					type_id: 1,
 					offset: 0,
-					flatten: false
+					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "small".to_string(),
 					ser_name: "small".to_string(),
 					type_id: 4,
 					offset: size_of::<Bar<u64, u32>>(),
-					flatten: false
+					flatten: false,
+					skip: false,
 				}
 			]
 		})
@@ -272,14 +283,16 @@ fn struct_generic_two_type_params() {
 					ser_name: "one".to_string(),
 					type_id: 2,
 					offset: 0,
-					flatten: false
+					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "two".to_string(),
 					ser_name: "two".to_string(),
 					type_id: 3,
 					offset: size_of::<u64>(),
-					flatten: false
+					flatten: false,
+					skip: false,
 				}
 			]
 		})
@@ -303,14 +316,16 @@ fn struct_generic_two_type_params() {
 					ser_name: "one".to_string(),
 					type_id: 5,
 					offset: 0,
-					flatten: false
+					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "two".to_string(),
 					ser_name: "two".to_string(),
 					type_id: 6,
 					offset: size_of::<u16>(),
-					flatten: false
+					flatten: false,
+					skip: false,
 				}
 			]
 		})
@@ -342,6 +357,7 @@ fn struct_with_serde_type_rename() {
 				type_id: 1,
 				offset: 0,
 				flatten: false,
+				skip: false,
 			}]
 		})
 	);
@@ -368,6 +384,7 @@ fn struct_with_serde_field_rename() {
 				type_id: 1,
 				offset: 0,
 				flatten: false,
+				skip: false,
 			}]
 		})
 	);
@@ -398,6 +415,7 @@ fn struct_with_serde_fields_rename_all() {
 					type_id: 1,
 					offset: 0,
 					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "field_two".to_string(),
@@ -405,6 +423,7 @@ fn struct_with_serde_fields_rename_all() {
 					type_id: 1,
 					offset: 1,
 					flatten: false,
+					skip: false,
 				},
 				DefStructField {
 					name: "field_three".to_string(),
@@ -412,6 +431,7 @@ fn struct_with_serde_fields_rename_all() {
 					type_id: 1,
 					offset: 2,
 					flatten: false,
+					skip: false,
 				},
 			],
 		})
@@ -444,6 +464,34 @@ fn struct_with_serde_field_flatten() {
 				type_id: 1,
 				offset: 0,
 				flatten: true,
+				skip: false,
+			}]
+		})
+	);
+}
+
+#[test]
+fn struct_with_serde_field_skip() {
+	#[derive(Inspect)]
+	struct Foo {
+		#[serde(skip)]
+		num: u8,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![DefStructField {
+				name: "num".to_string(),
+				ser_name: "num".to_string(),
+				type_id: 1,
+				offset: 0,
+				flatten: false,
+				skip: true,
 			}]
 		})
 	);
@@ -475,6 +523,7 @@ fn struct_with_serde_field_rename_and_flatten() {
 				type_id: 1,
 				offset: 0,
 				flatten: true,
+				skip: false,
 			}]
 		})
 	);
@@ -501,6 +550,7 @@ fn struct_with_serde_field_default() {
 				type_id: 1,
 				offset: 0,
 				flatten: false,
+				skip: false,
 			}]
 		})
 	);

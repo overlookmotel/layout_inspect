@@ -153,6 +153,7 @@ pub struct DefStructField {
 	pub type_id: TypeId,
 	pub offset: usize,
 	pub flatten: bool,
+	pub skip: bool,
 }
 
 #[apply(def)]

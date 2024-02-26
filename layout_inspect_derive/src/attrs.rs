@@ -5,6 +5,7 @@ pub struct SerdeAttrs {
 	pub rename: Option<String>,
 	pub rename_all: Option<String>,
 	pub flatten: bool,
+	pub skip: bool,
 }
 
 /// Parse `#[serde()]` attributes for a struct / enum / struct field / enum
@@ -67,10 +68,12 @@ pub fn get_serde_attrs(attrs: &Vec<Attribute>, host: &str) -> SerdeAttrs {
 						continue;
 					};
 
-					#[allow(clippy::single_match)]
 					match &*name {
 						"flatten" => {
 							out.flatten = true;
+						}
+						"skip" => {
+							out.skip = true;
 						}
 						_ => {}
 					}

@@ -129,6 +129,7 @@ fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStrea
 	let SerdeAttrs {
 		rename: ser_name,
 		flatten,
+		skip,
 		..
 	} = get_serde_attrs(&field.attrs, "struct field");
 
@@ -144,6 +145,7 @@ fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStrea
 			type_id: collector.collect::<#ty>(),
 			offset: offset_of!(Self, #name),
 			flatten: #flatten,
+			skip: #skip,
 		}
 	}
 }
