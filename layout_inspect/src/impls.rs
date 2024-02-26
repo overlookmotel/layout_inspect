@@ -9,7 +9,7 @@ use std::{
 use crate::{
 	defs::{
 		DefArc, DefBox, DefCell, DefMutex, DefOption, DefPhantomData, DefRc, DefRefCell, DefResult,
-		DefRwLock, DefStr, DefString, DefType, DefVec,
+		DefRwLock, DefStr, DefStrSlice, DefString, DefType, DefVec,
 	},
 	Inspect, TypesCollector,
 };
@@ -53,6 +53,28 @@ impl Inspect for str {
 		DefType::Str(DefStr {
 			name: Self::name(),
 			size: Self::size(),
+			align: Self::align().unwrap(),
+		})
+	}
+}
+
+impl<'a> Inspect for &'a str {
+	fn name() -> String {
+		"&str".to_string()
+	}
+
+	fn size() -> Option<usize> {
+		Some(size_of::<Self>())
+	}
+
+	fn align() -> Option<usize> {
+		Some(align_of::<Self>())
+	}
+
+	fn def(_collector: &mut TypesCollector) -> DefType {
+		DefType::StrSlice(DefStrSlice {
+			name: Self::name(),
+			size: Self::size().unwrap(),
 			align: Self::align().unwrap(),
 		})
 	}

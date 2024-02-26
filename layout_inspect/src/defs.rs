@@ -14,6 +14,7 @@ pub enum DefType {
 	Enum(DefEnum),
 	String(DefString),
 	Str(DefStr),
+	StrSlice(DefStrSlice),
 	Box(DefBox),
 	Vec(DefVec),
 	Option(DefOption),
@@ -39,6 +40,7 @@ macro_rules! getter {
 				DefType::Enum(DefEnum { $field, .. }) => $out,
 				DefType::String(DefString { $field, .. }) => $out,
 				DefType::Str(DefStr { $field, .. }) => $unsized_out,
+				DefType::StrSlice(DefStrSlice { $field, .. }) => $out,
 				DefType::Box(DefBox { $field, .. }) => $out,
 				DefType::Vec(DefVec { $field, .. }) => $out,
 				DefType::Option(DefOption { $field, .. }) => $out,
@@ -89,6 +91,8 @@ impl DefType {
 	to_methods!(String, DefString, into_string, to_string);
 
 	to_methods!(Str, DefStr, into_str, to_str);
+
+	to_methods!(StrSlice, DefStrSlice, into_str_slice, to_str_slice);
 
 	to_methods!(Box, DefBox, into_box, to_box);
 
@@ -223,5 +227,12 @@ pub struct DefString {
 pub struct DefStr {
 	pub name: String,
 	pub size: Option<usize>,
+	pub align: usize,
+}
+
+#[apply(def)]
+pub struct DefStrSlice {
+	pub name: String,
+	pub size: usize,
 	pub align: usize,
 }
