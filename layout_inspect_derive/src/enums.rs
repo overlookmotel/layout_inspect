@@ -1,18 +1,20 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
-	parse_quote, AttrStyle, Attribute, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics,
-	Ident, Lit, Meta, NestedMeta,
+	parse_quote, Attribute, DataEnum, Expr, Fields, FieldsUnnamed, GenericParam, Generics, Ident, Lit,
 };
 
-use crate::rename::{get_rename_attrs, rename};
+use crate::{
+	attrs::{get_serde_attrs, SerdeAttrs},
+	rename::get_ser_name,
+};
 
 // TODO: Support generic enums e.g. `enum Maybe<T> { Some(T), Nothing }`
 // TODO: Should `discriminant` be `i64` not `u64`?
 // TODO: For fieldless enums, use e.g. `Foo::Bar as u64` to get discriminants.
 // Discrimants can be defined as a const expression which we can't parse
 // e.g. `enum X { Y = mem::size_of::<u32>() }`
-// NB Only legal for enums where all variants are fieldless.
+// NB Only legal for enums where all variants are fieldless, or `#[repr(u8)]`.
 // That includes e.g. `enum X { Tuple(), Struct{} }`.
 // Also see: https://rust-lang.github.io/rfcs/2363-arbitrary-enum-discriminant.html
 // Maybe possible to obtain discriminant values for field-ful enums
@@ -26,7 +28,11 @@ pub fn derive_enum(
 ) -> TokenStream {
 	let mut next_discriminant: u64 = 0;
 
-	let (ser_name, rename_all) = get_rename_attrs(&attrs);
+	let SerdeAttrs {
+		rename: ser_name,
+		rename_all,
+		..
+	} = get_serde_attrs(&attrs, "enum");
 	let ser_name = ser_name.unwrap_or_else(|| ident.to_string());
 
 	let variant_defs: Vec<_> = data
@@ -35,37 +41,13 @@ pub fn derive_enum(
 		.map(|variant| {
 			let (ser_value, value_type_id) = match variant.fields {
 				Fields::Unit => {
-					// Find `#[serde(rename)]` attribute
-					let mut ser_value = None;
-					for attr in &variant.attrs {
-						if attr.style == AttrStyle::Outer && attr.path.is_ident("serde") {
-							let meta = attr.parse_meta().unwrap();
-							if let Meta::List(list) = meta {
-								for item in list.nested {
-									if let NestedMeta::Meta(Meta::NameValue(name_value)) = item {
-										if name_value.path.is_ident("rename") {
-											if let Lit::Str(s) = name_value.lit {
-												ser_value = Some(s.value());
-											} else {
-												panic!("Unexpected serde rename tag");
-											}
-										}
-									}
-								}
-							}
-						}
-					}
+					let SerdeAttrs {
+						rename: ser_value, ..
+					} = get_serde_attrs(&variant.attrs, "enum variant");
 
 					// Get varient value, optionally applying `rename_all` transform.
 					// `serde(rename)` on varient takes precedence.
-					let ser_value = ser_value.unwrap_or_else(|| {
-						let mut ser_value = variant.ident.to_string();
-						if let Some(rename_all) = &rename_all {
-							ser_value = rename(&ser_value, rename_all)
-						}
-						ser_value
-					});
-
+					let ser_value = get_ser_name(&variant.ident, &ser_value, &rename_all);
 					let ser_value = quote! { Some(#ser_value.to_string()) };
 					let value_type_id = quote! { None };
 					(ser_value, value_type_id)

@@ -1,11 +1,13 @@
 use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{
-	parse_quote, AttrStyle, Attribute, DataStruct, Field, Fields, FieldsNamed, GenericParam,
-	Generics, Ident, Lit, Meta, NestedMeta,
+	parse_quote, Attribute, DataStruct, Field, Fields, FieldsNamed, GenericParam, Generics, Ident,
 };
 
-use crate::rename::{get_rename_attrs, rename};
+use crate::{
+	attrs::{get_serde_attrs, SerdeAttrs},
+	rename::get_ser_name,
+};
 
 pub fn derive_struct(
 	data: DataStruct,
@@ -13,7 +15,11 @@ pub fn derive_struct(
 	mut generics: Generics,
 	attrs: Vec<Attribute>,
 ) -> TokenStream {
-	let (ser_name, rename_all) = get_rename_attrs(&attrs);
+	let SerdeAttrs {
+		rename: ser_name,
+		rename_all,
+		..
+	} = get_serde_attrs(&attrs, "struct");
 
 	// Get field definitions
 	let field_defs: Vec<TokenStream> = match data.fields {
@@ -118,56 +124,18 @@ fn get_named_field_defs(fields: FieldsNamed, rename_all: &Option<String>) -> Vec
 }
 
 fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStream {
-	// Get field name
 	let name = field.ident.as_ref().expect("Missing field name");
 
-	// Search field attributes for `#[serde(rename = "x")]` or `#[serde(flatten)]`
-	let mut ser_name: Option<String> = None;
-	let mut flatten = false;
-
-	for attr in &field.attrs {
-		if attr.style == AttrStyle::Outer && attr.path.is_ident("serde") {
-			let meta = attr.parse_meta().unwrap();
-			if let Meta::List(list) = meta {
-				for item in list.nested {
-					if let NestedMeta::Meta(meta) = item {
-						match meta {
-							// `#[serde(rename = "x")]`
-							Meta::NameValue(name_value) => {
-								if name_value.path.is_ident("rename") {
-									match &name_value.lit {
-										Lit::Str(s) => {
-											ser_name = Some(s.value());
-										}
-										_ => panic!("Unexpected serde rename tag"),
-									}
-								}
-							}
-							// `#[serde(flatten)]`
-							Meta::Path(path) => {
-								if path.is_ident("flatten") {
-									flatten = true;
-								}
-							}
-							_ => {}
-						}
-					}
-				}
-			}
-		}
-	}
+	let SerdeAttrs {
+		rename: ser_name,
+		flatten,
+		..
+	} = get_serde_attrs(&field.attrs, "struct field");
 
 	// Get field name, optionally applying `rename_all` transform.
 	// `serde(rename)` on field takes precedence.
-	let ser_name = ser_name.unwrap_or_else(|| {
-		let mut ser_name = name.to_string();
-		if let Some(rename_all) = &rename_all {
-			ser_name = rename(&ser_name, rename_all);
-		}
-		ser_name
-	});
+	let ser_name = get_ser_name(name, &ser_name, rename_all);
 
-	// Return field def
 	let ty = &field.ty;
 	quote! {
 		DefStructField {

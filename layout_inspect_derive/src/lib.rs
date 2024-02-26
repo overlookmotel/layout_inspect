@@ -4,6 +4,7 @@ mod structs;
 use structs::derive_struct;
 mod enums;
 use enums::derive_enum;
+mod attrs;
 mod rename;
 
 #[proc_macro_derive(Inspect, attributes(serde))]
