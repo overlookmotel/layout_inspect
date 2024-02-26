@@ -1,7 +1,7 @@
 use convert_case::{Case, Casing};
 use syn::Ident;
 
-/// Get struct field / enum varient name.
+/// Get struct field / enum variant name.
 pub fn get_ident_name(ident: &Ident) -> String {
 	let mut name = ident.to_string();
 	if name.starts_with("r#") {
@@ -10,7 +10,7 @@ pub fn get_ident_name(ident: &Ident) -> String {
 	name
 }
 
-/// Get struct field / enum varient serialization name.
+/// Get struct field / enum variant serialization name.
 /// `#[serde(rename)` takes priority.
 /// Apply `#[serde(rename_all)` transform.
 pub fn get_ser_name(name: &str, renamed: &Option<String>, rename_all: &Option<String>) -> String {
@@ -23,7 +23,7 @@ pub fn get_ser_name(name: &str, renamed: &Option<String>, rename_all: &Option<St
 	}
 }
 
-/// Rename field/varient name according to `#[serde(rename_all = "...")]` attr
+/// Rename field/variant name according to `#[serde(rename_all = "...")]` attr
 fn rename(s: &str, rename_all: &str) -> String {
 	match rename_all {
 		"lowercase" => s.to_lowercase(),

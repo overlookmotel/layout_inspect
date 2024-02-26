@@ -9,7 +9,7 @@ pub struct SerdeAttrs {
 }
 
 /// Parse `#[serde()]` attributes for a struct / enum / struct field / enum
-/// varient
+/// variant
 pub fn get_serde_attrs(attrs: &Vec<Attribute>, host: &str) -> SerdeAttrs {
 	let mut out = SerdeAttrs::default();
 	for attr in attrs {

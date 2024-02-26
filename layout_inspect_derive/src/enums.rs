@@ -47,8 +47,8 @@ pub fn derive_enum(
 						rename: ser_value, ..
 					} = get_serde_attrs(&variant.attrs, "enum variant");
 
-					// Get varient value, optionally applying `rename_all` transform.
-					// `serde(rename)` on varient takes precedence.
+					// Get variant value, optionally applying `rename_all` transform.
+					// `serde(rename)` on variant takes precedence.
 					let ser_value = get_ser_name(&name, &ser_value, &rename_all);
 					let ser_value = quote! { Some(#ser_value.to_string()) };
 					let value_type_id = quote! { None };
