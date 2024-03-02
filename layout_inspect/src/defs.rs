@@ -168,8 +168,7 @@ pub struct DefEnum {
 	pub size: usize,
 	pub align: usize,
 	pub variants: Vec<DefEnumVariant>,
-	pub tag: Option<String>,
-	pub untagged: bool,
+	pub tag: DefEnumTag,
 }
 
 #[apply(def)]
@@ -179,6 +178,22 @@ pub struct DefEnumVariant {
 	// TODO: Need `offset` here or `discriminant_size` in `DefEnum`
 	pub ser_value: Option<String>,
 	pub value_type_id: Option<TypeId>,
+}
+
+#[apply(def)]
+#[cfg_attr(feature = "serde", serde(tag = "kind", content = "data"))]
+pub enum DefEnumTag {
+	None,
+	Tag(String),
+	TagAndContent { tag: String, content: String },
+	Untagged,
+}
+
+pub fn foo() -> DefEnumTag {
+	DefEnumTag::TagAndContent {
+		tag: "tt".to_string(),
+		content: "cc".to_string(),
+	}
 }
 
 macro_rules! single_type_param {

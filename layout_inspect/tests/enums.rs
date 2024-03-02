@@ -1,7 +1,7 @@
 use std::mem::{align_of, size_of, transmute};
 
 use layout_inspect::{
-	defs::{DefEnum, DefEnumVariant, DefType},
+	defs::{DefEnum, DefEnumTag, DefEnumVariant, DefType},
 	inspect, Inspect,
 };
 
@@ -35,8 +35,7 @@ fn enum_fieldless() {
 					value_type_id: None
 				},
 			],
-			tag: None,
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 
@@ -78,45 +77,7 @@ fn enum_fieldless_raw_identifier_variant_name() {
 					value_type_id: None
 				},
 			],
-			tag: None,
-			untagged: false,
-		})
-	);
-}
-
-#[test]
-fn enum_fieldless_with_serde_tag() {
-	#[allow(dead_code)]
-	#[derive(Inspect)]
-	#[serde(tag = "type")]
-	enum Foo {
-		Opt1,
-		Opt2,
-	}
-
-	assert_eq!(
-		inspect::<Foo>()[0],
-		DefType::Enum(DefEnum {
-			name: "Foo".to_string(),
-			ser_name: "Foo".to_string(),
-			size: 1,
-			align: 1,
-			variants: vec![
-				DefEnumVariant {
-					name: "Opt1".to_string(),
-					discriminant: 0,
-					ser_value: Some("Opt1".to_string()),
-					value_type_id: None
-				},
-				DefEnumVariant {
-					name: "Opt2".to_string(),
-					discriminant: 1,
-					ser_value: Some("Opt2".to_string()),
-					value_type_id: None
-				},
-			],
-			tag: Some("type".to_string()),
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 }
@@ -152,8 +113,7 @@ fn enum_fieldless_with_serde_type_rename() {
 					value_type_id: None
 				},
 			],
-			tag: None,
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 }
@@ -190,8 +150,7 @@ fn enum_fieldless_with_serde_variant_rename() {
 					value_type_id: None
 				},
 			],
-			tag: None,
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 }
@@ -235,8 +194,7 @@ fn enum_fieldless_with_serde_variants_rename_all() {
 					value_type_id: None
 				},
 			],
-			tag: None,
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 }
@@ -285,8 +243,7 @@ fn enum_fieldless_with_discriminants() {
 					value_type_id: None
 				},
 			],
-			tag: None,
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 
@@ -332,14 +289,88 @@ fn enum_fieldful() {
 					value_type_id: Some(2)
 				},
 			],
-			tag: None,
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 
 	let variant_ids = get_variant_ids(&type_defs[0]);
 	assert_eq!(type_defs[variant_ids[0].unwrap()].name(), "u8");
 	assert_eq!(type_defs[variant_ids[1].unwrap()].name(), "u16");
+}
+
+#[test]
+fn enum_fieldful_with_serde_tag() {
+	#[allow(dead_code)]
+	#[derive(Inspect)]
+	#[serde(tag = "type")]
+	enum Foo {
+		Opt1(u8),
+		Opt2(u16),
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: 4,
+			align: 2,
+			variants: vec![
+				DefEnumVariant {
+					name: "Opt1".to_string(),
+					discriminant: 0,
+					ser_value: None,
+					value_type_id: Some(1)
+				},
+				DefEnumVariant {
+					name: "Opt2".to_string(),
+					discriminant: 1,
+					ser_value: None,
+					value_type_id: Some(2)
+				},
+			],
+			tag: DefEnumTag::Tag("type".to_string()),
+		})
+	);
+}
+
+#[test]
+fn enum_fieldful_with_serde_tag_and_content() {
+	#[allow(dead_code)]
+	#[derive(Inspect)]
+	#[serde(tag = "t", content = "c")]
+	enum Foo {
+		Opt1(u8),
+		Opt2(u16),
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: 4,
+			align: 2,
+			variants: vec![
+				DefEnumVariant {
+					name: "Opt1".to_string(),
+					discriminant: 0,
+					ser_value: None,
+					value_type_id: Some(1)
+				},
+				DefEnumVariant {
+					name: "Opt2".to_string(),
+					discriminant: 1,
+					ser_value: None,
+					value_type_id: Some(2)
+				},
+			],
+			tag: DefEnumTag::TagAndContent {
+				tag: "t".to_string(),
+				content: "c".to_string()
+			},
+		})
+	);
 }
 
 #[test]
@@ -373,8 +404,7 @@ fn enum_fieldful_with_serde_untagged() {
 					value_type_id: Some(2)
 				},
 			],
-			tag: None,
-			untagged: true,
+			tag: DefEnumTag::Untagged,
 		})
 	);
 }
@@ -411,8 +441,7 @@ fn enum_mixed_fieldless_and_fieldful() {
 					value_type_id: Some(1)
 				},
 			],
-			tag: None,
-			untagged: false,
+			tag: DefEnumTag::None,
 		})
 	);
 

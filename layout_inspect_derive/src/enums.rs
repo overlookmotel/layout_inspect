@@ -32,11 +32,23 @@ pub fn derive_enum(
 		rename: ser_name,
 		rename_all,
 		tag,
+		content,
 		untagged,
 		..
 	} = get_serde_attrs(&attrs, "enum");
 	let ser_name = ser_name.unwrap_or_else(|| ident.to_string());
-	let tag = tag.map_or_else(|| quote! { None }, |tag| quote! { Some(#tag.to_string()) });
+
+	let tag = if let Some(tag) = tag {
+		if let Some(content) = content {
+			quote! { DefEnumTag::TagAndContent {tag: #tag.to_string(), content: #content.to_string()} }
+		} else {
+			quote! { DefEnumTag::Tag(#tag.to_string()) }
+		}
+	} else if untagged {
+		quote! { DefEnumTag::Untagged }
+	} else {
+		quote! { DefEnumTag::None }
+	};
 
 	let variant_defs: Vec<_> = data
 		.variants
@@ -113,7 +125,7 @@ pub fn derive_enum(
 				stringify, vec,
 			};
 			use ::layout_inspect::{
-				defs::{DefEnum, DefEnumVariant, DefType},
+				defs::{DefEnum, DefEnumTag, DefEnumVariant, DefType},
 				Inspect, TypesCollector,
 			};
 
@@ -139,7 +151,6 @@ pub fn derive_enum(
 						align: <Self as Inspect>::align().unwrap(),
 						variants: vec![#(#variant_defs),*],
 						tag: #tag,
-						untagged: #untagged,
 					})
 				}
 			}

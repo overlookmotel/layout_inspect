@@ -5,9 +5,10 @@ pub struct SerdeAttrs {
 	pub rename: Option<String>,
 	pub rename_all: Option<String>,
 	pub tag: Option<String>,
+	pub content: Option<String>,
+	pub untagged: bool,
 	pub flatten: bool,
 	pub skip: bool,
-	pub untagged: bool,
 }
 
 /// Parse `#[serde()]` attributes for a struct / enum / struct field / enum
@@ -65,6 +66,12 @@ pub fn get_serde_attrs(attrs: &Vec<Attribute>, host: &str) -> SerdeAttrs {
 								panic!("Multiple serde `tag` tags on same {}", host);
 							}
 							out.tag = Some(value);
+						}
+						"content" => {
+							if out.content.is_some() {
+								panic!("Multiple serde `content` tags on same {}", host);
+							}
+							out.content = Some(value);
 						}
 						_ => {}
 					}
