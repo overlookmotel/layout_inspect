@@ -1,7 +1,8 @@
-use proc_macro2::TokenStream;
+use proc_macro2::{Span, TokenStream};
 use quote::quote;
 use syn::{
-	parse_quote, Attribute, DataStruct, Field, Fields, FieldsNamed, GenericParam, Generics, Ident,
+	parse_quote, Attribute, DataStruct, Field, Fields, FieldsNamed, FieldsUnnamed, GenericParam,
+	Generics, Ident, Index, Member,
 };
 
 use crate::{
@@ -25,7 +26,7 @@ pub fn derive_struct(
 	// Get field definitions
 	let field_defs: Vec<TokenStream> = match data.fields {
 		Fields::Named(fields) => get_named_field_defs(fields, &rename_all),
-		Fields::Unnamed(_fields) => todo!("Unnamed struct fields not supported"),
+		Fields::Unnamed(fields) => get_unnamed_field_defs(fields, &rename_all),
 		Fields::Unit => vec![],
 	};
 
@@ -123,14 +124,36 @@ fn get_named_field_defs(fields: FieldsNamed, rename_all: &Option<String>) -> Vec
 	fields
 		.named
 		.iter()
-		.map(|field| get_named_field_def(field, rename_all))
+		.map(|field| {
+			let ident = field.ident.as_ref().expect("Missing field name");
+			let member: Member = parse_quote!(#ident);
+			let name = get_ident_name(ident);
+			get_field_def(field, member, name, rename_all)
+		})
 		.collect()
 }
 
-fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStream {
-	let ident = field.ident.as_ref().expect("Missing field name");
-	let name = get_ident_name(ident);
+fn get_unnamed_field_defs(fields: FieldsUnnamed, rename_all: &Option<String>) -> Vec<TokenStream> {
+	fields
+		.unnamed
+		.iter()
+		.enumerate()
+		.map(|(index, field)| {
+			let member = Member::Unnamed(Index {
+				index: index as u32,
+				span: Span::call_site(),
+			});
+			get_field_def(field, member, index.to_string(), rename_all)
+		})
+		.collect()
+}
 
+fn get_field_def(
+	field: &Field,
+	member: Member,
+	name: String,
+	rename_all: &Option<String>,
+) -> TokenStream {
 	let SerdeAttrs {
 		rename: ser_name,
 		flatten,
@@ -148,7 +171,7 @@ fn get_named_field_def(field: &Field, rename_all: &Option<String>) -> TokenStrea
 			name: #name.to_string(),
 			ser_name: #ser_name.to_string(),
 			type_id: collector.collect::<#ty>(),
-			offset: offset_of!(Self, #ident),
+			offset: offset_of!(Self, #member),
 			flatten: #flatten,
 			skip: #skip,
 		}

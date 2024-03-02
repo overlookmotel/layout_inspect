@@ -5,8 +5,6 @@ use layout_inspect::{
 	inspect, Inspect,
 };
 
-// TODO: Test for tuple struct - not implemented yet
-
 #[test]
 fn struct_single_field() {
 	#[derive(Inspect)]
@@ -180,6 +178,113 @@ fn struct_raw_identifier_field_name() {
 
 	let field_ids = get_field_ids(&type_defs[0]);
 	assert_eq!(type_defs[field_ids[0]].name(), "u8");
+}
+
+#[test]
+fn tuple_struct_empty() {
+	#[derive(Inspect)]
+	struct Foo();
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: Some(0),
+			align: Some(1),
+			fields: vec![],
+			tag: None,
+		})
+	);
+}
+
+#[test]
+fn tuple_struct_single_field() {
+	#[derive(Inspect)]
+	struct Foo(u8);
+
+	let type_defs = inspect::<Foo>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![DefStructField {
+				name: "0".to_string(),
+				ser_name: "0".to_string(),
+				type_id: 1,
+				offset: 0,
+				flatten: false,
+				skip: false,
+			}],
+			tag: None,
+		})
+	);
+
+	let field_ids = get_field_ids(&type_defs[0]);
+	assert_eq!(type_defs[field_ids[0]].name(), "u8");
+}
+
+#[test]
+fn tuple_struct_multiple_fields() {
+	#[derive(Inspect)]
+	struct Foo(u8, u16, Vec<u8>, Option<Box<Foo>>);
+
+	let type_defs = inspect::<Foo>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![
+				DefStructField {
+					name: "0".to_string(),
+					ser_name: "0".to_string(),
+					type_id: 1,
+					offset: size_of::<usize>() * 4 + size_of::<u16>(),
+					flatten: false,
+					skip: false,
+				},
+				DefStructField {
+					name: "1".to_string(),
+					ser_name: "1".to_string(),
+					type_id: 2,
+					offset: size_of::<usize>() * 4,
+					flatten: false,
+					skip: false,
+				},
+				DefStructField {
+					name: "2".to_string(),
+					ser_name: "2".to_string(),
+					type_id: 3,
+					offset: 0,
+					flatten: false,
+					skip: false,
+				},
+				DefStructField {
+					name: "3".to_string(),
+					ser_name: "3".to_string(),
+					type_id: 4,
+					offset: size_of::<usize>() * 3,
+					flatten: false,
+					skip: false,
+				}
+			],
+			tag: None,
+		})
+	);
+
+	let field_ids = get_field_ids(&type_defs[0]);
+	assert_eq!(type_defs[field_ids[0]].name(), "u8");
+	assert_eq!(type_defs[field_ids[1]].name(), "u16");
+	assert_eq!(type_defs[field_ids[2]].name(), "Vec<u8>");
+	assert_eq!(type_defs[field_ids[3]].name(), "Option<Box<Foo>>");
 }
 
 #[test]
