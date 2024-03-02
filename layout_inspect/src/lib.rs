@@ -7,7 +7,9 @@ pub use layout_inspect_derive::Inspect;
 // Used by `Inspect` derive macro
 #[cfg(feature = "derive")]
 #[doc(hidden)]
-pub use memoffset::offset_of as __offset_of;
+pub mod __private {
+	pub use memoffset;
+}
 
 pub mod defs;
 mod impls;

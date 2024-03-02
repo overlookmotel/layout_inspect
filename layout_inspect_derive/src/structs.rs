@@ -83,7 +83,7 @@ pub fn derive_struct(
 				stringify, vec,
 			};
 			use ::layout_inspect::{
-				__offset_of as offset_of,
+				__private::memoffset::offset_of,
 				defs::{DefStruct, DefStructField, DefType},
 				Inspect, TypesCollector,
 			};
