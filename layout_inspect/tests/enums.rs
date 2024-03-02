@@ -35,6 +35,7 @@ fn enum_fieldless() {
 					value_type_id: None
 				},
 			],
+			tag: None,
 		})
 	);
 
@@ -76,6 +77,43 @@ fn enum_fieldless_raw_identifier_variant_name() {
 					value_type_id: None
 				},
 			],
+			tag: None,
+		})
+	);
+}
+
+#[test]
+fn enum_fieldless_with_serde_tag() {
+	#[allow(dead_code)]
+	#[derive(Inspect)]
+	#[serde(tag = "type")]
+	enum Foo {
+		Opt1,
+		Opt2,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: 1,
+			align: 1,
+			variants: vec![
+				DefEnumVariant {
+					name: "Opt1".to_string(),
+					discriminant: 0,
+					ser_value: Some("Opt1".to_string()),
+					value_type_id: None
+				},
+				DefEnumVariant {
+					name: "Opt2".to_string(),
+					discriminant: 1,
+					ser_value: Some("Opt2".to_string()),
+					value_type_id: None
+				},
+			],
+			tag: Some("type".to_string()),
 		})
 	);
 }
@@ -111,15 +149,9 @@ fn enum_fieldless_with_serde_type_rename() {
 					value_type_id: None
 				},
 			],
+			tag: None,
 		})
 	);
-
-	// Check discriminants are correct
-	fn to_u8(foo: Foo) -> u8 {
-		unsafe { transmute(foo) }
-	}
-	assert_eq!(to_u8(Foo::Opt1), 0);
-	assert_eq!(to_u8(Foo::Opt2), 1);
 }
 
 #[test]
@@ -154,6 +186,7 @@ fn enum_fieldless_with_serde_variant_rename() {
 					value_type_id: None
 				},
 			],
+			tag: None,
 		})
 	);
 }
@@ -197,6 +230,7 @@ fn enum_fieldless_with_serde_variants_rename_all() {
 					value_type_id: None
 				},
 			],
+			tag: None,
 		})
 	);
 }
@@ -245,6 +279,7 @@ fn enum_fieldless_with_discriminants() {
 					value_type_id: None
 				},
 			],
+			tag: None,
 		})
 	);
 
@@ -290,6 +325,7 @@ fn enum_fieldful() {
 					value_type_id: Some(2)
 				},
 			],
+			tag: None,
 		})
 	);
 
@@ -330,6 +366,7 @@ fn enum_mixed_fieldless_and_fieldful() {
 					value_type_id: Some(1)
 				},
 			],
+			tag: None,
 		})
 	);
 

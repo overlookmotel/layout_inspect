@@ -148,6 +148,7 @@ pub struct DefStruct {
 	pub size: Option<usize>,
 	pub align: Option<usize>,
 	pub fields: Vec<DefStructField>,
+	pub tag: Option<String>,
 }
 
 #[apply(def)]
@@ -167,6 +168,7 @@ pub struct DefEnum {
 	pub size: usize,
 	pub align: usize,
 	pub variants: Vec<DefEnumVariant>,
+	pub tag: Option<String>,
 }
 
 #[apply(def)]

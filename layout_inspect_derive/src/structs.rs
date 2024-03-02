@@ -18,6 +18,7 @@ pub fn derive_struct(
 	let SerdeAttrs {
 		rename: ser_name,
 		rename_all,
+		tag,
 		..
 	} = get_serde_attrs(&attrs, "struct");
 
@@ -68,6 +69,8 @@ pub fn derive_struct(
 		name.clone()
 	};
 
+	let tag = tag.map_or_else(|| quote! { None }, |tag| quote! { Some(#tag.to_string()) });
+
 	// Return `impl` code
 	let (impl_generics, type_generics, where_clause) = generics.split_for_impl();
 
@@ -108,6 +111,7 @@ pub fn derive_struct(
 						size: <Self as Inspect>::size(),
 						align: <Self as Inspect>::align(),
 						fields: vec![#(#field_defs),*],
+						tag: #tag,
 					})
 				}
 			}

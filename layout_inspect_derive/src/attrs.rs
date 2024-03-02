@@ -4,6 +4,7 @@ use syn::{AttrStyle, Attribute, Lit, Meta, NestedMeta};
 pub struct SerdeAttrs {
 	pub rename: Option<String>,
 	pub rename_all: Option<String>,
+	pub tag: Option<String>,
 	pub flatten: bool,
 	pub skip: bool,
 }
@@ -57,6 +58,12 @@ pub fn get_serde_attrs(attrs: &Vec<Attribute>, host: &str) -> SerdeAttrs {
 								panic!("Multiple serde `rename_all` tags on same {}", host);
 							}
 							out.rename_all = Some(value);
+						}
+						"tag" => {
+							if out.tag.is_some() {
+								panic!("Multiple serde `tag` tags on same {}", host);
+							}
+							out.tag = Some(value);
 						}
 						_ => {}
 					}

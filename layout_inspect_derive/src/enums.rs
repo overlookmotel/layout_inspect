@@ -31,9 +31,11 @@ pub fn derive_enum(
 	let SerdeAttrs {
 		rename: ser_name,
 		rename_all,
+		tag,
 		..
 	} = get_serde_attrs(&attrs, "enum");
 	let ser_name = ser_name.unwrap_or_else(|| ident.to_string());
+	let tag = tag.map_or_else(|| quote! { None }, |tag| quote! { Some(#tag.to_string()) });
 
 	let variant_defs: Vec<_> = data
 		.variants
@@ -135,6 +137,7 @@ pub fn derive_enum(
 						size: <Self as Inspect>::size().unwrap(),
 						align: <Self as Inspect>::align().unwrap(),
 						variants: vec![#(#variant_defs),*],
+						tag: #tag,
 					})
 				}
 			}

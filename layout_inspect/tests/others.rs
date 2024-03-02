@@ -74,7 +74,8 @@ fn str_slice() {
 					flatten: false,
 					skip: false,
 				}
-			]
+			],
+			tag: None,
 		})
 	);
 
