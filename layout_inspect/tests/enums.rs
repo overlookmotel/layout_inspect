@@ -36,6 +36,7 @@ fn enum_fieldless() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 
@@ -78,6 +79,7 @@ fn enum_fieldless_raw_identifier_variant_name() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 }
@@ -114,6 +116,7 @@ fn enum_fieldless_with_serde_tag() {
 				},
 			],
 			tag: Some("type".to_string()),
+			untagged: false,
 		})
 	);
 }
@@ -150,6 +153,7 @@ fn enum_fieldless_with_serde_type_rename() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 }
@@ -187,6 +191,7 @@ fn enum_fieldless_with_serde_variant_rename() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 }
@@ -231,6 +236,7 @@ fn enum_fieldless_with_serde_variants_rename_all() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 }
@@ -280,6 +286,7 @@ fn enum_fieldless_with_discriminants() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 
@@ -326,12 +333,50 @@ fn enum_fieldful() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 
 	let variant_ids = get_variant_ids(&type_defs[0]);
 	assert_eq!(type_defs[variant_ids[0].unwrap()].name(), "u8");
 	assert_eq!(type_defs[variant_ids[1].unwrap()].name(), "u16");
+}
+
+#[test]
+fn enum_fieldful_with_serde_untagged() {
+	#[allow(dead_code)]
+	#[derive(Inspect)]
+	#[serde(untagged)]
+	enum Foo {
+		Opt1(u8),
+		Opt2(u16),
+	}
+
+	assert_eq!(
+		&inspect::<Foo>()[0],
+		&DefType::Enum(DefEnum {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: size_of::<Foo>(),
+			align: align_of::<Foo>(),
+			variants: vec![
+				DefEnumVariant {
+					name: "Opt1".to_string(),
+					discriminant: 0,
+					ser_value: None,
+					value_type_id: Some(1)
+				},
+				DefEnumVariant {
+					name: "Opt2".to_string(),
+					discriminant: 1,
+					ser_value: None,
+					value_type_id: Some(2)
+				},
+			],
+			tag: None,
+			untagged: true,
+		})
+	);
 }
 
 #[test]
@@ -367,6 +412,7 @@ fn enum_mixed_fieldless_and_fieldful() {
 				},
 			],
 			tag: None,
+			untagged: false,
 		})
 	);
 

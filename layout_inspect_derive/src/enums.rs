@@ -32,6 +32,7 @@ pub fn derive_enum(
 		rename: ser_name,
 		rename_all,
 		tag,
+		untagged,
 		..
 	} = get_serde_attrs(&attrs, "enum");
 	let ser_name = ser_name.unwrap_or_else(|| ident.to_string());
@@ -138,6 +139,7 @@ pub fn derive_enum(
 						align: <Self as Inspect>::align().unwrap(),
 						variants: vec![#(#variant_defs),*],
 						tag: #tag,
+						untagged: #untagged,
 					})
 				}
 			}

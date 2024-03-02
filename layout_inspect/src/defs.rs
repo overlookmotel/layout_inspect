@@ -169,6 +169,7 @@ pub struct DefEnum {
 	pub align: usize,
 	pub variants: Vec<DefEnumVariant>,
 	pub tag: Option<String>,
+	pub untagged: bool,
 }
 
 #[apply(def)]
