@@ -20,6 +20,7 @@ pub fn derive_struct(
 		rename: ser_name,
 		rename_all,
 		tag,
+		transparent,
 		..
 	} = get_serde_attrs(&attrs, "struct");
 
@@ -113,6 +114,7 @@ pub fn derive_struct(
 						align: <Self as Inspect>::align(),
 						fields: vec![#(#field_defs),*],
 						tag: #tag,
+						transparent: #transparent,
 					})
 				}
 			}

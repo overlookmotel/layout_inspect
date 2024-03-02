@@ -9,6 +9,7 @@ pub struct SerdeAttrs {
 	pub untagged: bool,
 	pub flatten: bool,
 	pub skip: bool,
+	pub transparent: bool,
 }
 
 /// Parse `#[serde()]` attributes for a struct / enum / struct field / enum
@@ -92,6 +93,9 @@ pub fn get_serde_attrs(attrs: &Vec<Attribute>, host: &str) -> SerdeAttrs {
 						}
 						"untagged" => {
 							out.untagged = true;
+						}
+						"transparent" => {
+							out.transparent = true;
 						}
 						_ => {}
 					}

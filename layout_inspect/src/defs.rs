@@ -149,6 +149,7 @@ pub struct DefStruct {
 	pub align: Option<usize>,
 	pub fields: Vec<DefStructField>,
 	pub tag: Option<String>,
+	pub transparent: bool,
 }
 
 #[apply(def)]

@@ -30,6 +30,7 @@ fn struct_single_field() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -51,6 +52,7 @@ fn struct_empty() {
 			align: Some(1),
 			fields: vec![],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -69,6 +71,7 @@ fn struct_unit() {
 			align: Some(1),
 			fields: vec![],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -127,6 +130,7 @@ fn struct_multiple_fields() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -173,6 +177,7 @@ fn struct_raw_identifier_field_name() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -194,6 +199,7 @@ fn tuple_struct_empty() {
 			align: Some(1),
 			fields: vec![],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -221,6 +227,7 @@ fn tuple_struct_single_field() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -277,6 +284,7 @@ fn tuple_struct_multiple_fields() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -285,6 +293,38 @@ fn tuple_struct_multiple_fields() {
 	assert_eq!(type_defs[field_ids[1]].name(), "u16");
 	assert_eq!(type_defs[field_ids[2]].name(), "Vec<u8>");
 	assert_eq!(type_defs[field_ids[3]].name(), "Option<Box<Foo>>");
+}
+
+#[test]
+fn tuple_struct_with_serde_transparent() {
+	#[derive(Inspect)]
+	#[serde(transparent)]
+	struct Foo(u8);
+
+	let type_defs = inspect::<Foo>();
+
+	assert_eq!(
+		&type_defs[0],
+		&DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![DefStructField {
+				name: "0".to_string(),
+				ser_name: "0".to_string(),
+				type_id: 1,
+				offset: 0,
+				flatten: false,
+				skip: false,
+			}],
+			tag: None,
+			transparent: true,
+		})
+	);
+
+	let field_ids = get_field_ids(&type_defs[0]);
+	assert_eq!(type_defs[field_ids[0]].name(), "u8");
 }
 
 #[test]
@@ -328,6 +368,7 @@ fn struct_generic_one_type_param() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -349,6 +390,7 @@ fn struct_generic_one_type_param() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -372,6 +414,7 @@ fn struct_generic_one_type_param() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -421,6 +464,7 @@ fn struct_generic_two_type_params() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -452,6 +496,7 @@ fn struct_generic_two_type_params() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -486,6 +531,7 @@ fn struct_generic_two_type_params() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
@@ -518,6 +564,7 @@ fn struct_with_serde_type_rename() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -546,6 +593,36 @@ fn struct_with_serde_tag() {
 				skip: false,
 			}],
 			tag: Some("type".to_string()),
+			transparent: false,
+		})
+	);
+}
+
+#[test]
+fn struct_with_serde_transparent() {
+	#[derive(Inspect)]
+	#[serde(transparent)]
+	struct Foo {
+		num: u8,
+	}
+
+	assert_eq!(
+		inspect::<Foo>()[0],
+		DefType::Struct(DefStruct {
+			name: "Foo".to_string(),
+			ser_name: "Foo".to_string(),
+			size: Some(size_of::<Foo>()),
+			align: Some(align_of::<Foo>()),
+			fields: vec![DefStructField {
+				name: "num".to_string(),
+				ser_name: "num".to_string(),
+				type_id: 1,
+				offset: 0,
+				flatten: false,
+				skip: false,
+			}],
+			tag: None,
+			transparent: true,
 		})
 	);
 }
@@ -574,6 +651,7 @@ fn struct_with_serde_field_rename() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -623,6 +701,7 @@ fn struct_with_serde_fields_rename_all() {
 				},
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -656,6 +735,7 @@ fn struct_with_serde_field_flatten() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -684,6 +764,7 @@ fn struct_with_serde_field_skip() {
 				skip: true,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -717,6 +798,7 @@ fn struct_with_serde_field_rename_and_flatten() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 }
@@ -745,6 +827,7 @@ fn struct_with_serde_field_default() {
 				skip: false,
 			}],
 			tag: None,
+			transparent: false,
 		})
 	);
 }

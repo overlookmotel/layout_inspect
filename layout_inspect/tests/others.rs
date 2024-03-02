@@ -76,6 +76,7 @@ fn str_slice() {
 				}
 			],
 			tag: None,
+			transparent: false,
 		})
 	);
 
